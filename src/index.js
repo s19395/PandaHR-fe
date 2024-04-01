@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './components/App';
 import reportWebVitals from './reportWebVitals';
 import { DevSupport } from '@react-buddy/ide-toolbox';
 import { ComponentPreviews, useInitial } from './dev';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
+import App from './components/App';
+import Box from '@mui/material/Box';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -15,7 +16,9 @@ root.render(
     <DevSupport ComponentPreviews={ComponentPreviews} useInitialHook={useInitial}>
       <CssBaseline />
       <ThemeProvider theme={theme}>
-        <App />
+        <Box sx={{ display: 'flex' }}>
+          <App />
+        </Box>
       </ThemeProvider>
     </DevSupport>
   </React.StrictMode>
