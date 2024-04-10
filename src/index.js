@@ -7,8 +7,8 @@ import { ComponentPreviews, useInitial } from './dev';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
-import App from './components/App';
 import Box from '@mui/material/Box';
+import AppContent from './components/AppContent';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -17,7 +17,7 @@ root.render(
       <CssBaseline />
       <ThemeProvider theme={theme}>
         <Box sx={{ display: 'flex' }}>
-          <App />
+          <AppContent />
         </Box>
       </ThemeProvider>
     </DevSupport>

@@ -28,8 +28,7 @@ export default class Content extends React.Component {
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar />
         <h3>This is a response from the backend</h3>
-        {this.state.data &&
-          this.state.data.map((line) => <Typography paragraph>{line}</Typography>)}
+        <Typography paragraph>{this.state.data}</Typography>
         <h3>This is not a response from the backend</h3>
         <Typography paragraph>
           Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget nulla
