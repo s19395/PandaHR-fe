@@ -7,8 +7,8 @@ import { ComponentPreviews, useInitial } from './dev';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
-import Box from '@mui/material/Box';
-import AppContent from './components/AppContent';
+import App from './App';
+import AuthProvider from './helper/authProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,9 +16,9 @@ root.render(
     <DevSupport ComponentPreviews={ComponentPreviews} useInitialHook={useInitial}>
       <CssBaseline />
       <ThemeProvider theme={theme}>
-        <Box sx={{ display: 'flex' }}>
-          <AppContent />
-        </Box>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </ThemeProvider>
     </DevSupport>
   </React.StrictMode>
