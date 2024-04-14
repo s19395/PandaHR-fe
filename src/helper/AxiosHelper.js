@@ -7,6 +7,7 @@ axios.defaults.baseURL = process.env.REACT_APP_ENDPOINT;
 export const useRequestWithNotification = () => {
   const { setAlert } = useAlert();
 
+  // eslint-disable-next-line no-unused-vars
   return async (method, endpoint, data = {}, showAlert = false) => {
     try {
       const response = await request(method, endpoint, data);
@@ -38,11 +39,11 @@ export const getAuthToken = () => {
   return window.localStorage.getItem('token');
 };
 
-export const request = async (method, url, data) => {
+export const request = async (method, url, data, token = getAuthToken()) => {
   let headers = {};
 
-  if (getAuthToken() !== null && getAuthToken() !== 'null') {
-    headers = { Authorization: `Bearer ${getAuthToken()}` };
+  if (token !== null && token !== 'null') {
+    headers = { Authorization: `Bearer ${token}` };
   }
 
   return axios({

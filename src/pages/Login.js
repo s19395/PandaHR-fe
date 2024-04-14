@@ -13,10 +13,9 @@ import Link from '@mui/material/Link';
 import * as React from 'react';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 
 const Login = () => {
-  const { token, setToken } = useAuth();
+  const { setToken } = useAuth();
   const requestWithNotification = useRequestWithNotification();
   const navigate = useNavigate();
 
@@ -26,14 +25,6 @@ const Login = () => {
   const [loginError, setLoginError] = React.useState(false);
   const [passwordError, setPasswordError] = React.useState(false);
 
-  useEffect(() => {
-    if (token) {
-      navigate('/', {
-        replace: true
-      });
-    }
-  }, [token]);
-
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -41,7 +32,8 @@ const Login = () => {
         login,
         password
       });
-      setToken(data.token);
+      setToken(data.token); // Wait for the token to be set
+      navigate('/', { replace: true });
     } catch (error) {
       setToken();
       setLoginError(true);

@@ -3,12 +3,14 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { request } from '../../helper/AxiosHelper';
+import { useAuth } from '../../helper/AuthProvider';
 
 const Content = () => {
   const [data, setData] = useState([]);
+  const { token } = useAuth(); // Get the token from the AuthProvider
 
   useEffect(() => {
-    request('GET', '/messages')
+    request('GET', '/messages', null, token)
       .then((response) => {
         console.log(response.data);
         setData(response.data);
