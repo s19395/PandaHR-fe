@@ -13,9 +13,10 @@ import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import * as React from 'react';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
+import { useEffect } from 'react';
 
 const Login = () => {
-  const { setToken } = useAuth();
+  const { token, setToken } = useAuth();
   const navigate = useNavigate();
   const requestWithNotification = useRequestWithNotification();
 
@@ -25,6 +26,12 @@ const Login = () => {
   const [loginError, setLoginError] = React.useState(false);
   const [passwordError, setPasswordError] = React.useState(false);
 
+  useEffect(() => {
+    if (token) {
+      navigate('/messages');
+    }
+  }, [token]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -33,7 +40,6 @@ const Login = () => {
         password
       });
       setToken(data.token);
-      navigate('/', { replace: true });
     } catch (error) {
       setToken();
       setLoginError(true);

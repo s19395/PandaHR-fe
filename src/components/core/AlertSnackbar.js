@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert } from '@mui/lab';
+import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import { useAlert } from '../../helper/AlertProvider';
 
