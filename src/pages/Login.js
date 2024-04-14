@@ -12,15 +12,19 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import * as React from 'react';
+import { useAlert } from '../helper/AlertProvider';
 import axios from 'axios';
 
 const Login = () => {
   const { setToken } = useAuth();
+  const { setAlert } = useAlert();
   const navigate = useNavigate();
 
   // Use the useState hook to manage state
   const [login, setLogin] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [loginError, setLoginError] = React.useState(false);
+  const [passwordError, setPasswordError] = React.useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -31,8 +35,16 @@ const Login = () => {
       });
       setToken(response.data.token);
       navigate('/content', { replace: true });
+      setAlert({ open: true, severity: 'success', message: 'Operation successful' });
     } catch (error) {
       setToken();
+      setAlert({
+        open: true,
+        severity: 'error',
+        message: 'HTTP ' + error.response.status + ': ' + error.response.data.message
+      });
+      setLoginError(true);
+      setPasswordError(true);
       console.error(error);
     }
   };
@@ -54,6 +66,7 @@ const Login = () => {
         </Typography>
         <Box component="form" noValidate sx={{ mt: 1 }}>
           <TextField
+            error={loginError}
             margin="normal"
             required
             fullWidth
@@ -66,6 +79,7 @@ const Login = () => {
             onChange={(e) => setLogin(e.target.value)}
           />
           <TextField
+            error={passwordError}
             margin="normal"
             required
             fullWidth
