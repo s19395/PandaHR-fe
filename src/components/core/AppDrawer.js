@@ -13,7 +13,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import Navbar from './Navbar';
 
 const drawerWidth = 240;
-export default function FixedDrawer() {
+export default function AppDrawer() {
   return (
     <>
       <Navbar />
