@@ -1,11 +1,11 @@
 import * as React from 'react';
 import Content from './Content';
-import FixedDrawer from './FixedDrawer';
+import AppDrawer from './AppDrawer';
 
 export default function Core() {
   return (
     <>
-      <FixedDrawer />
+      <AppDrawer />
       <Content />
     </>
   );

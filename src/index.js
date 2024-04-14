@@ -8,7 +8,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
 import App from './App';
-import AuthProvider from './helper/authProvider';
+import AuthProvider from './helper/AuthProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
