@@ -8,12 +8,9 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
 export const useRequestWithNotification = () => {
   const { setAlert } = useAlert();
 
-  return async (endpoint, method, data = {}, showAlert = false) => {
+  return async (method, endpoint, data = {}, showAlert = false) => {
     try {
-      const response = await axios(endpoint, {
-        method,
-        data: data
-      });
+      const response = await request(method, endpoint, data);
 
       if (showAlert) {
         setAlert({
@@ -42,7 +39,7 @@ export const getAuthToken = () => {
   return window.localStorage.getItem('token');
 };
 
-export const request = (method, url, data) => {
+export const request = async (method, url, data) => {
   let headers = {};
 
   if (getAuthToken() !== null && getAuthToken() !== 'null') {

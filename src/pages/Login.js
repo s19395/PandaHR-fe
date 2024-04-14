@@ -28,7 +28,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const data = await requestWithNotification('/login', 'POST', {
+      const data = await requestWithNotification('POST', '/login', {
         login,
         password
       });
