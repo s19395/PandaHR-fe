@@ -19,7 +19,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   // Use the useState hook to manage state
-  // eslint-disable-next-line no-unused-vars
   const [login, setLogin] = React.useState('');
   const [password, setPassword] = React.useState('');
 

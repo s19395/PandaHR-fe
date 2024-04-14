@@ -3,7 +3,7 @@ import { useAuth } from '../helper/AuthProvider';
 import { ProtectedRoute } from './ProtectedRoute';
 import Logout from '../pages/Logout';
 import Login from '../pages/Login';
-import Core from '../components/core/Core';
+import Content from '../components/core/Content';
 
 const Routes = () => {
   const { token } = useAuth();
@@ -40,7 +40,7 @@ const Routes = () => {
         },
         {
           path: '/content',
-          element: <Core />
+          element: <Content />
         }
       ]
     }
