@@ -1,13 +1,10 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import { useAuth } from '../helper/AuthProvider';
 import { ProtectedRoute } from './ProtectedRoute';
 import Logout from '../pages/Logout';
 import Login from '../pages/Login';
 import Core from '../components/core/Core';
 
 const Routes = () => {
-  const { token } = useAuth();
-
   // Define public routes accessible to all users
   const routesForPublic = [
     {
@@ -57,7 +54,7 @@ const Routes = () => {
   // Combine and conditionally include routes based on authentication status
   const router = createBrowserRouter([
     ...routesForPublic,
-    ...(!token ? routesForNotAuthenticatedOnly : []),
+    ...routesForNotAuthenticatedOnly,
     ...routesForAuthenticatedOnly
   ]);
 

@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../helper/AuthProvider';
 import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -13,12 +12,13 @@ import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import * as React from 'react';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
+import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
 const Login = () => {
   const { token, setToken } = useAuth();
-  const navigate = useNavigate();
   const requestWithNotification = useRequestWithNotification();
+  const navigate = useNavigate();
 
   // Use the useState hook to manage state
   const [login, setLogin] = React.useState('');
@@ -28,7 +28,9 @@ const Login = () => {
 
   useEffect(() => {
     if (token) {
-      navigate('/messages');
+      navigate('/', {
+        replace: true
+      });
     }
   }, [token]);
 
