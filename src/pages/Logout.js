@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../helper/authProvider';
-import { Button } from 'baseui/button';
+import Button from '@mui/material/Button';
 
 const Logout = () => {
   const { setToken } = useAuth();

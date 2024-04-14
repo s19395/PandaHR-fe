@@ -2,7 +2,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import { request } from '../../helper/axios_helper';
+import axios from 'axios';
 
 export default class Content extends React.Component {
   constructor(props) {
@@ -13,7 +13,8 @@ export default class Content extends React.Component {
   }
 
   componentDidMount() {
-    request('get', '/messages')
+    axios
+      .get('http://localhost:8080/messages')
       .then((response) => {
         console.log(response.data);
         this.setState({ data: response.data });
