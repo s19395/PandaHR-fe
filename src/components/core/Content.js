@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { request } from '../../helper/AxiosHelper';
 
 const Content = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios
-      .get('http://localhost:8080/messages')
+    request('GET', '/messages')
       .then((response) => {
         console.log(response.data);
         setData(response.data);
