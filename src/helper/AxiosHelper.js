@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { useAlert } from './AlertProvider';
 
-//axios.defaults.baseURL = 'http://localhost:8080';
-axios.defaults.baseURL = 'https://pandahr.azurewebsites.net';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.baseURL = process.env.REACT_APP_ENDPOINT;
 
 export const useRequestWithNotification = () => {
   const { setAlert } = useAlert();
