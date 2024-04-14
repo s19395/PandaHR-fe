@@ -12,13 +12,12 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import * as React from 'react';
-import { useAlert } from '../helper/AlertProvider';
-import axios from 'axios';
+import { useRequestWithNotification } from '../helper/AxiosHelper';
 
 const Login = () => {
   const { setToken } = useAuth();
-  const { setAlert } = useAlert();
   const navigate = useNavigate();
+  const requestWithNotification = useRequestWithNotification();
 
   // Use the useState hook to manage state
   const [login, setLogin] = React.useState('');
@@ -29,20 +28,14 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8080/login', {
+      const data = await requestWithNotification('/login', 'POST', {
         login,
         password
       });
-      setToken(response.data.token);
-      navigate('/content', { replace: true });
-      setAlert({ open: true, severity: 'success', message: 'Operation successful' });
+      setToken(data.token);
+      navigate('/', { replace: true });
     } catch (error) {
       setToken();
-      setAlert({
-        open: true,
-        severity: 'error',
-        message: 'HTTP ' + error.response.status + ': ' + error.response.data.message
-      });
       setLoginError(true);
       setPasswordError(true);
       console.error(error);
