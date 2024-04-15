@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../helper/AuthProvider';
 import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -12,27 +11,33 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import * as React from 'react';
-import axios from 'axios';
+import { useRequestWithNotification } from '../helper/AxiosHelper';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const { setToken } = useAuth();
+  const requestWithNotification = useRequestWithNotification();
   const navigate = useNavigate();
 
   // Use the useState hook to manage state
   const [login, setLogin] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [loginError, setLoginError] = React.useState(false);
+  const [passwordError, setPasswordError] = React.useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8080/login', {
+      const data = await requestWithNotification('POST', '/login', {
         login,
         password
       });
-      setToken(response.data.token);
-      navigate('/content', { replace: true });
+      setToken(data.token); // Wait for the token to be set
+      navigate('/', { replace: true });
     } catch (error) {
       setToken();
+      setLoginError(true);
+      setPasswordError(true);
       console.error(error);
     }
   };
@@ -54,6 +59,7 @@ const Login = () => {
         </Typography>
         <Box component="form" noValidate sx={{ mt: 1 }}>
           <TextField
+            error={loginError}
             margin="normal"
             required
             fullWidth
@@ -66,6 +72,7 @@ const Login = () => {
             onChange={(e) => setLogin(e.target.value)}
           />
           <TextField
+            error={passwordError}
             margin="normal"
             required
             fullWidth

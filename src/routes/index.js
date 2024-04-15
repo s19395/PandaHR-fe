@@ -3,7 +3,7 @@ import { useAuth } from '../helper/AuthProvider';
 import { ProtectedRoute } from './ProtectedRoute';
 import Logout from '../pages/Logout';
 import Login from '../pages/Login';
-import Content from '../components/core/Content';
+import Core from '../components/core/Core';
 
 const Routes = () => {
   const { token } = useAuth();
@@ -28,7 +28,7 @@ const Routes = () => {
       children: [
         {
           path: '',
-          element: <div>User Home Page</div>
+          element: <Core />
         },
         {
           path: '/profile',
@@ -40,7 +40,7 @@ const Routes = () => {
         },
         {
           path: '/content',
-          element: <Content />
+          element: <Core />
         }
       ]
     }
