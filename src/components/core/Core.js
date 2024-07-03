@@ -1,6 +1,6 @@
 import * as React from 'react';
-import Content from './Content';
 import AppDrawer from './AppDrawer';
+import Content from './Content';
 
 export default function Core() {
   return (

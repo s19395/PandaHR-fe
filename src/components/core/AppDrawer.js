@@ -10,9 +10,19 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import PersonIcon from '@mui/icons-material/Person';
 import Navbar from './Navbar';
+import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
+
+const items = [
+  { text: 'Pracownicy', icon: <PersonIcon />, link: '/employees' },
+  { text: 'Starred', icon: <InboxIcon />, link: '/starred' },
+  { text: 'Send email', icon: <InboxIcon />, link: '/send-email' },
+  { text: 'Drafts', icon: <InboxIcon />, link: '/drafts' }
+];
+
 export default function AppDrawer() {
   return (
     <>
@@ -27,10 +37,10 @@ export default function AppDrawer() {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+            {items.map(({ text, icon, link }) => (
               <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+                <ListItemButton component={Link} to={link} key={text}>
+                  <ListItemIcon>{icon}</ListItemIcon>
                   <ListItemText primary={text} />
                 </ListItemButton>
               </ListItem>

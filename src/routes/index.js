@@ -4,21 +4,14 @@ import { ProtectedRoute } from './ProtectedRoute';
 import Logout from '../pages/Logout';
 import Login from '../pages/Login';
 import Core from '../components/core/Core';
+import Content from '../components/core/Content';
+
+import Employees from '../pages/Employees';
+import * as React from 'react';
+import ErrorPage from '../components/core/ErrorPage';
 
 const Routes = () => {
   const { token } = useAuth();
-
-  // Define public routes accessible to all users
-  const routesForPublic = [
-    {
-      path: '/service',
-      element: <div>Service Page</div>
-    },
-    {
-      path: '/about-us',
-      element: <div>About Us</div>
-    }
-  ];
 
   // Define routes accessible only to authenticated users
   const routesForAuthenticatedOnly = [
@@ -28,7 +21,7 @@ const Routes = () => {
       children: [
         {
           path: '',
-          element: <Core />
+          element: <Content />
         },
         {
           path: '/profile',
@@ -41,8 +34,13 @@ const Routes = () => {
         {
           path: '/content',
           element: <Core />
+        },
+        {
+          path: '/employees',
+          element: <Employees />
         }
-      ]
+      ],
+      errorElement: <ErrorPage />
     }
   ];
 
@@ -56,7 +54,6 @@ const Routes = () => {
 
   // Combine and conditionally include routes based on authentication status
   const router = createBrowserRouter([
-    ...routesForPublic,
     ...(!token ? routesForNotAuthenticatedOnly : []),
     ...routesForAuthenticatedOnly
   ]);
