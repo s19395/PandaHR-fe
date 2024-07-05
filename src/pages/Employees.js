@@ -5,17 +5,18 @@ import { request } from '../helper/AxiosHelper';
 import { useAuth } from '../helper/AuthProvider';
 
 export default function Employees() {
-  const columns = ['Imię', 'Nazwisko', 'Date of Birth'];
+  const columns = ['Imię', 'Nazwisko', 'Wiek'];
   const [data, setData] = useState([]);
   const { token } = useAuth(); // Get the token from the AuthProvider
 
   useEffect(() => {
     request('GET', '/employees/findAll', null, token)
       .then((response) => {
-        const transformedData = response.data.map((employee) => [
+        const { data: employeesData } = response.data;
+        const transformedData = employeesData.map((employee) => [
           employee.firstName,
           employee.lastName,
-          employee.dateOfBirth
+          employee.age
         ]);
         setData(transformedData);
       })
