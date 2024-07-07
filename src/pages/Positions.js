@@ -21,10 +21,12 @@ import {
   List
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+import positionsTheme from './themes/positionsTheme';
+import { ThemeProvider } from '@mui/material/styles';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment';
 
-export default function Employees() {
+export default function Positions() {
   const [validationErrors, setValidationErrors] = useState({});
   const [fetchedPositions, setFetchedPositions] = useState([]);
   const [isLoadingPositions, setIsLoadingPositions] = useState(true);
@@ -182,6 +184,22 @@ export default function Employees() {
       ? { color: 'error', children: 'Error loading data' }
       : undefined,
     muiTableContainerProps: { sx: { minHeight: '500px' } },
+    renderDetailPanel: ({ row }) => (
+      <Box sx={{ mb: 1 }}>
+        <List>
+          {row.original.positionDuty.map((duty, index) => (
+            <Box key={index} sx={{ marginBottom: '1px' }}>
+              {' '}
+              {/* Adjusted marginBottom to 1px */}
+              <ListItem>
+                <ListItemText primary={duty.description} />
+              </ListItem>
+            </Box>
+          ))}
+        </List>
+      </Box>
+    ),
+    enableExpandAll: false,
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: (props) => handleSavePosition({ ...props, isNew: true }),
     onEditingRowCancel: () => setValidationErrors({}),
@@ -189,7 +207,7 @@ export default function Employees() {
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
         <DialogTitle variant="h5">Utwórz stanowisko</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {internalEditComponents.filter(
             (component) =>
               !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey)
@@ -249,5 +267,9 @@ export default function Employees() {
     state: { isLoading: isLoadingPositions, isSaving, showAlertBanner: isLoadingPositionsError }
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <ThemeProvider theme={positionsTheme}>
+      <MaterialReactTable table={table} />
+    </ThemeProvider>
+  );
 }
