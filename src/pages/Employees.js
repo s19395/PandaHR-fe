@@ -16,6 +16,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
+import moment from 'moment/moment';
 
 export default function Employees() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -47,7 +48,7 @@ export default function Employees() {
         accessorKey: 'id',
         header: 'Id',
         enableEditing: false,
-        size: 80
+        size: 30
       },
       {
         accessorKey: 'firstName',
@@ -78,23 +79,28 @@ export default function Employees() {
         }
       },
       {
-        accessorKey: 'email',
-        header: 'Email',
+        accessorFn: (row) => moment().diff(row.dateOfBirth, 'years'),
+        header: 'Wiek',
+        enableEditing: false
+      },
+      {
+        accessorKey: 'dateOfBirth',
+        header: 'Data urodzenia',
+        Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD.MM.YYYY')}</span>,
         muiEditTextFieldProps: {
-          type: 'email',
-          required: true,
-          error: !!validationErrors?.email,
-          helperText: validationErrors?.email,
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              email: undefined
-            })
+          value: moment().subtract(18, 'years').format('YYYY-MM-DD'),
+          variant: 'standard',
+          type: 'date',
+          InputLabelProps: { shrink: true },
+          inputProps: {
+            min: '1900-01-01', // Optional: to set a minimum date
+            max: moment().format('YYYY-MM-DD') // Optional: to set a maximum date
+          }
         }
       },
       {
-        accessorKey: 'state',
-        header: 'State',
+        accessorKey: 'employmentContract',
+        header: 'Forma zatrudnienia',
         editVariant: 'select',
         // editSelectOptions: usStates,
         muiEditTextFieldProps: {
@@ -102,6 +108,10 @@ export default function Employees() {
           error: !!validationErrors?.state,
           helperText: validationErrors?.state
         }
+      },
+      {
+        accessorKey: 'address',
+        header: 'Adres zamieszkania'
       }
     ],
     [validationErrors]
@@ -178,6 +188,9 @@ export default function Employees() {
         minHeight: '500px'
       }
     },
+    enableFullScreenToggle: false,
+    enableDensityToggle: false,
+    positionActionsColumn: 'last',
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateUser,
     onEditingRowCancel: () => setValidationErrors({}),
