@@ -161,7 +161,11 @@ export default function Positions() {
         </List>
       </Box>
     ),
-    enableExpandAll: false,
+    enableFullScreenToggle: false,
+    enableExpandAll: true,
+    enableStickyHeader: true,
+    enableStickyFooter: true,
+    enableDensityToggle: false,
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: (props) => handleSavePosition({ ...props, isNew: true }),
     onEditingRowCancel: () => setValidationErrors({}),
