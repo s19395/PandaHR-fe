@@ -80,6 +80,13 @@ export default function Positions() {
           error: !!validationErrors?.status,
           helperText: validationErrors?.status
         }
+      },
+      {
+        accessorFn: (row) => row.dutyList.map((duty) => duty.description).join(', '),
+        //accessorFn used to access nested data, though you could just use dot notation in an accessorKey
+        id: 'dutyList',
+        header: '',
+        hidden: true
       }
     ],
     [validationErrors]
@@ -240,7 +247,12 @@ export default function Positions() {
         Utwórz stanowisko
       </Button>
     ),
-    state: { isLoading: isLoadingPositions, isSaving, showAlertBanner: isLoadingPositionsError }
+    state: {
+      isLoading: isLoadingPositions,
+      isSaving,
+      showAlertBanner: isLoadingPositionsError,
+      columnVisibility: { dutyList: false }
+    }
   });
 
   return (
