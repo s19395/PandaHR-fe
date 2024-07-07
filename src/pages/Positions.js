@@ -11,19 +11,17 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  InputAdornment,
-  ListItemSecondaryAction,
   Tooltip,
-  TextField,
   ListItemText,
   ListItem,
   List
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import positionsTheme from './themes/positionsTheme';
 import { ThemeProvider } from '@mui/material/styles';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment';
+import Duties from './Duties';
 
 export default function Positions() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -133,48 +131,6 @@ export default function Positions() {
     setIsSaving(false);
   };
 
-  const handleAddDuty = () => {
-    if (newDuty.trim()) {
-      setDutyList((prev) => [...prev, { description: newDuty }]);
-      setNewDuty('');
-    }
-  };
-
-  const handleRemoveDuty = (index) => setDutyList((prev) => prev.filter((_, i) => i !== index));
-
-  const dutiesUI = (
-    <>
-      <TextField
-        variant="standard"
-        label="Obowiązki"
-        value={newDuty}
-        onChange={(e) => setNewDuty(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && handleAddDuty()}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={handleAddDuty} aria-label="add">
-                <AddIcon />
-              </IconButton>
-            </InputAdornment>
-          )
-        }}
-      />
-      <List>
-        {dutyList.map((duty, index) => (
-          <ListItem key={index}>
-            <ListItemText primary={duty.description} />
-            <ListItemSecondaryAction>
-              <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveDuty(index)}>
-                <DeleteIcon />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
-      </List>
-    </>
-  );
-
   const table = useMaterialReactTable({
     columns,
     data: fetchedPositions,
@@ -218,7 +174,12 @@ export default function Positions() {
             (component) =>
               !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey)
           )}
-          {dutiesUI}
+          <Duties
+            dutyList={dutyList}
+            setDutyList={setDutyList}
+            newDuty={newDuty}
+            setNewDuty={setNewDuty}
+          />
         </DialogContent>
         <DialogActions>
           <MRT_EditActionButtons variant="text" table={table} row={row} />
@@ -237,7 +198,12 @@ export default function Positions() {
               (component) =>
                 !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey)
             )}
-            {dutiesUI}
+            <Duties
+              dutyList={dutyList}
+              setDutyList={setDutyList}
+              newDuty={newDuty}
+              setNewDuty={setNewDuty}
+            />
           </DialogContent>
           <DialogActions>
             <MRT_EditActionButtons variant="text" table={table} row={row} />
