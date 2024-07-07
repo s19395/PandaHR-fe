@@ -19,11 +19,11 @@ export const useRequestWithNotification = () => {
         setAlert({
           open: true,
           severity: 'success',
-          message: 'Operation successful'
+          message: response.data.message
         });
       }
 
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(error);
 
