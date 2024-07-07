@@ -14,7 +14,6 @@ import {
   InputAdornment,
   ListItemSecondaryAction,
   Tooltip,
-  Typography,
   TextField,
   ListItemText,
   ListItem,
@@ -32,24 +31,25 @@ export default function Positions() {
   const [isLoadingPositions, setIsLoadingPositions] = useState(true);
   const [isLoadingPositionsError, setIsLoadingPositionsError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [duties, setDuties] = useState([]);
+  const [dutyList, setDutyList] = useState([]);
   const [newDuty, setNewDuty] = useState('');
 
   const requestWithNotification = useRequestWithNotification();
   const statuses = ['ACTIVE', 'INACTIVE'];
 
+  const fetchPositions = async () => {
+    try {
+      setIsLoadingPositions(true);
+      const data = await requestWithNotification('get', '/positions/findAll');
+      setFetchedPositions(data);
+      setIsLoadingPositions(false);
+    } catch (error) {
+      setIsLoadingPositionsError(true);
+      setIsLoadingPositions(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchPositions = async () => {
-      try {
-        setIsLoadingPositions(true);
-        const data = await requestWithNotification('get', '/positions/findAll');
-        setFetchedPositions(data);
-        setIsLoadingPositions(false);
-      } catch (error) {
-        setIsLoadingPositionsError(true);
-        setIsLoadingPositions(false);
-      }
-    };
     fetchPositions();
   }, []);
 
@@ -104,15 +104,17 @@ export default function Positions() {
     try {
       const method = isNew ? 'post' : 'put';
       const url = isNew ? '/positions' : `/positions/${values.pid}`;
-      const newPosition = await requestWithNotification(method, url, { ...values, duties }, true);
+      const newPosition = await requestWithNotification(method, url, { ...values, dutyList }, true);
       if (isNew) {
         setFetchedPositions((prev) => [...prev, newPosition]);
         table.setCreatingRow(null);
+        fetchPositions();
       } else {
         setFetchedPositions((prev) =>
           prev.map((position) => (position.pid === values.pid ? values : position))
         );
         table.setEditingRow(null);
+        fetchPositions();
       }
     } catch (error) {
       /* empty */
@@ -133,21 +135,21 @@ export default function Positions() {
 
   const handleAddDuty = () => {
     if (newDuty.trim()) {
-      setDuties((prev) => [...prev, { description: newDuty }]);
+      setDutyList((prev) => [...prev, { description: newDuty }]);
       setNewDuty('');
     }
   };
 
-  const handleRemoveDuty = (index) => setDuties((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveDuty = (index) => setDutyList((prev) => prev.filter((_, i) => i !== index));
 
   const dutiesUI = (
     <>
-      <Typography variant="h6">Duties</Typography>
       <TextField
         variant="standard"
-        label="New Duty"
+        label="Obowiązki"
         value={newDuty}
         onChange={(e) => setNewDuty(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleAddDuty()}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -159,7 +161,7 @@ export default function Positions() {
         }}
       />
       <List>
-        {duties.map((duty, index) => (
+        {dutyList.map((duty, index) => (
           <ListItem key={index}>
             <ListItemText primary={duty.description} />
             <ListItemSecondaryAction>
@@ -187,15 +189,19 @@ export default function Positions() {
     renderDetailPanel: ({ row }) => (
       <Box sx={{ mb: 1 }}>
         <List>
-          {row.original.positionDuty.map((duty, index) => (
-            <Box key={index} sx={{ marginBottom: '1px' }}>
-              {' '}
-              {/* Adjusted marginBottom to 1px */}
-              <ListItem>
-                <ListItemText primary={duty.description} />
-              </ListItem>
-            </Box>
-          ))}
+          {Array.isArray(row.original.dutyList) ? (
+            row.original.dutyList.map((duty, index) => (
+              <Box key={index} sx={{ marginBottom: '1px' }}>
+                <ListItem>
+                  <ListItemText primary={duty.description} />
+                </ListItem>
+              </Box>
+            ))
+          ) : (
+            <ListItem>
+              <ListItemText primary="No duties available" />
+            </ListItem>
+          )}
         </List>
       </Box>
     ),
@@ -221,7 +227,7 @@ export default function Positions() {
     ),
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => {
       useEffect(() => {
-        if (row?.original?.positionDuty) setDuties(row.original.positionDuty);
+        if (row?.original?.dutyList) setDutyList(row.original.dutyList);
       }, [row]);
       return (
         <>
