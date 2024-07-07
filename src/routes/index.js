@@ -3,12 +3,12 @@ import { useAuth } from '../helper/AuthProvider';
 import { ProtectedRoute } from './ProtectedRoute';
 import Logout from '../pages/Logout';
 import Login from '../pages/Login';
-import Core from '../components/core/Core';
 import Content from '../components/core/Content';
 
 import Employees from '../pages/Employees';
 import * as React from 'react';
 import ErrorPage from '../components/core/ErrorPage';
+import Positions from '../pages/Positions';
 
 const Routes = () => {
   const { token } = useAuth();
@@ -32,12 +32,12 @@ const Routes = () => {
           element: <Logout />
         },
         {
-          path: '/content',
-          element: <Core />
-        },
-        {
           path: '/employees',
           element: <Employees />
+        },
+        {
+          path: '/positions',
+          element: <Positions />
         }
       ],
       errorElement: <ErrorPage />

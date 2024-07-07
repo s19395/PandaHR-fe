@@ -11,22 +11,21 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import PersonIcon from '@mui/icons-material/Person';
-import Navbar from './Navbar';
+import WorkIcon from '@mui/icons-material/Work';
 import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
 
 const items = [
   { text: 'Pracownicy', icon: <PersonIcon />, link: '/employees' },
-  { text: 'Starred', icon: <InboxIcon />, link: '/starred' },
+  { text: 'Stanowiska', icon: <WorkIcon />, link: '/Positions' },
   { text: 'Send email', icon: <InboxIcon />, link: '/send-email' },
   { text: 'Drafts', icon: <InboxIcon />, link: '/drafts' }
 ];
 
-export default function AppDrawer() {
+export default function LeftDrawer() {
   return (
     <>
-      <Navbar />
       <Drawer
         variant="permanent"
         sx={{
