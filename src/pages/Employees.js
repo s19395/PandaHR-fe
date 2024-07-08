@@ -277,13 +277,7 @@ export default function Employees() {
       isLoading: isLoadingEmployees,
       isSaving,
       showAlertBanner: isLoadingEmployeesError,
-      columnVisibility: { street: false, city: false, zipCode: false, country: false },
-      sorting: [
-        {
-          id: 'id',
-          desc: false
-        }
-      ]
+      columnVisibility: { street: false, city: false, zipCode: false, country: false }
     }
   });
 
