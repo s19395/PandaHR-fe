@@ -17,22 +17,18 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment/moment';
+import { ThemeProvider } from '@mui/material/styles';
+import muiDialogTheme from './themes/muiDialogTheme';
 
 export default function Employees() {
   const [validationErrors, setValidationErrors] = useState({});
   const [fetchedEmployees, setFetchedEmployees] = useState([]);
-  const [fetchedEmploymentContracts, setFetchedEmploymentContracts] = useState([]);
-
   const [isLoadingEmployees, setIsLoadingEmployees] = useState(true);
   const [isLoadingEmployeesError, setIsLoadingEmployeesError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
   const requestWithNotification = useRequestWithNotification();
 
-  const fetchEmploymentTypes = async () => {
-    const data = await requestWithNotification('get', '/employees/employmentContracts');
-    setFetchedEmploymentContracts(data);
-  };
+  const employmentContracts = ['Pełny etat', 'Zlecenie', 'Brak umowy'];
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -47,7 +43,6 @@ export default function Employees() {
       }
     };
 
-    fetchEmploymentTypes();
     fetchEmployees();
   }, []);
 
@@ -110,7 +105,7 @@ export default function Employees() {
         accessorKey: 'employmentContract',
         header: 'Forma zatrudnienia',
         editVariant: 'select',
-        editSelectOptions: fetchedEmploymentContracts,
+        editSelectOptions: employmentContracts,
         muiEditTextFieldProps: {
           select: true,
           error: !!validationErrors?.fetchedEmploymentContracts,
@@ -227,7 +222,7 @@ export default function Employees() {
     onEditingRowSave: handleSaveEmployee,
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h3">Create New Employee</DialogTitle>
+        <DialogTitle variant="h5">Nowy pracownik</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {internalEditComponents.filter(
             (component) =>
@@ -242,7 +237,7 @@ export default function Employees() {
     ),
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h3">Edit Employee</DialogTitle>
+        <DialogTitle variant="h5">Edycja pracownika</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {internalEditComponents.filter(
             (component) =>
@@ -275,18 +270,28 @@ export default function Employees() {
         onClick={() => {
           table.setCreatingRow(true);
         }}>
-        Create New Employee
+        Stwórz pracownika
       </Button>
     ),
     state: {
       isLoading: isLoadingEmployees,
       isSaving,
       showAlertBanner: isLoadingEmployeesError,
-      columnVisibility: { street: false, city: false, zipCode: false, country: false }
+      columnVisibility: { street: false, city: false, zipCode: false, country: false },
+      sorting: [
+        {
+          id: 'id',
+          desc: false
+        }
+      ]
     }
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <ThemeProvider theme={muiDialogTheme}>
+      <MaterialReactTable table={table} />
+    </ThemeProvider>
+  );
 }
 
 const validateRequired = (value) => !!value.length;

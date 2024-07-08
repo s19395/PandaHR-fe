@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
-const positionsTheme = createTheme({
+const muiDialogTheme = createTheme({
   components: {
     MuiListItem: {
       styleOverrides: {
@@ -23,4 +23,4 @@ const positionsTheme = createTheme({
   }
 });
 
-export default positionsTheme;
+export default muiDialogTheme;

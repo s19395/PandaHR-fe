@@ -17,7 +17,7 @@ import {
   List
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import positionsTheme from './themes/positionsTheme';
+import muiDialogTheme from './themes/muiDialogTheme';
 import { ThemeProvider } from '@mui/material/styles';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment';
@@ -179,7 +179,7 @@ export default function Positions() {
     onEditingRowSave: handleSavePosition,
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h5">Utwórz stanowisko</DialogTitle>
+        <DialogTitle variant="h5">Nowe stanowisko</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {internalEditComponents.filter(
             (component) =>
@@ -203,7 +203,7 @@ export default function Positions() {
       }, [row]);
       return (
         <>
-          <DialogTitle variant="h5">Edytuj stanowisko</DialogTitle>
+          <DialogTitle variant="h5">Edycja stanowiska</DialogTitle>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {internalEditComponents.filter(
               (component) =>
@@ -244,19 +244,25 @@ export default function Positions() {
     positionActionsColumn: 'last',
     renderTopToolbarCustomActions: ({ table }) => (
       <Button variant="contained" onClick={() => table.setCreatingRow(true)}>
-        Utwórz stanowisko
+        Stwórz stanowisko
       </Button>
     ),
     state: {
       isLoading: isLoadingPositions,
       isSaving,
       showAlertBanner: isLoadingPositionsError,
-      columnVisibility: { dutyList: false }
+      columnVisibility: { dutyList: false },
+      sorting: [
+        {
+          id: 'pid',
+          desc: false
+        }
+      ]
     }
   });
 
   return (
-    <ThemeProvider theme={positionsTheme}>
+    <ThemeProvider theme={muiDialogTheme}>
       <MaterialReactTable table={table} />
     </ThemeProvider>
   );
