@@ -16,29 +16,34 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
+import moment from 'moment/moment';
+import { ThemeProvider } from '@mui/material/styles';
+import muiDialogTheme from './themes/muiDialogTheme';
 
 export default function Employees() {
   const [validationErrors, setValidationErrors] = useState({});
-  const [fetchedUsers, setFetchedUsers] = useState([]);
-  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
-  const [isLoadingUsersError, setIsLoadingUsersError] = useState(false);
+  const [fetchedEmployees, setFetchedEmployees] = useState([]);
+  const [isLoadingEmployees, setIsLoadingEmployees] = useState(true);
+  const [isLoadingEmployeesError, setIsLoadingEmployeesError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
   const requestWithNotification = useRequestWithNotification();
 
+  const employmentContracts = ['Pełny etat', 'Zlecenie', 'Brak umowy'];
+
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchEmployees = async () => {
       try {
-        setIsLoadingUsers(true);
+        setIsLoadingEmployees(true);
         const data = await requestWithNotification('get', '/employees/findAll');
-        setFetchedUsers(data);
-        setIsLoadingUsers(false);
+        setFetchedEmployees(data);
+        setIsLoadingEmployees(false);
       } catch (error) {
-        setIsLoadingUsersError(true);
-        setIsLoadingUsers(false);
+        setIsLoadingEmployeesError(true);
+        setIsLoadingEmployees(false);
       }
     };
-    fetchUsers();
+
+    fetchEmployees();
   }, []);
 
   const columns = useMemo(
@@ -47,7 +52,7 @@ export default function Employees() {
         accessorKey: 'id',
         header: 'Id',
         enableEditing: false,
-        size: 80
+        maxSize: 30
       },
       {
         accessorKey: 'firstName',
@@ -78,37 +83,65 @@ export default function Employees() {
         }
       },
       {
-        accessorKey: 'email',
-        header: 'Email',
+        accessorFn: (row) => moment().diff(row.dateOfBirth, 'years'),
+        header: 'Wiek',
+        maxSize: 30
+      },
+      {
+        accessorKey: 'dateOfBirth',
+        header: 'Data urodzenia',
+        Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD.MM.YYYY')}</span>,
         muiEditTextFieldProps: {
-          type: 'email',
-          required: true,
-          error: !!validationErrors?.email,
-          helperText: validationErrors?.email,
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              email: undefined
-            })
+          variant: 'standard',
+          type: 'date',
+          InputLabelProps: { shrink: true },
+          inputProps: {
+            min: '1900-01-01',
+            max: moment().format('YYYY-MM-DD') //
+          }
         }
       },
       {
-        accessorKey: 'state',
-        header: 'State',
+        accessorKey: 'employmentContract',
+        header: 'Forma zatrudnienia',
         editVariant: 'select',
-        // editSelectOptions: usStates,
+        editSelectOptions: employmentContracts,
         muiEditTextFieldProps: {
           select: true,
-          error: !!validationErrors?.state,
-          helperText: validationErrors?.state
+          error: !!validationErrors?.fetchedEmploymentContracts,
+          helperText: validationErrors?.fetchedEmploymentContracts
         }
+      },
+      {
+        accessorFn: (row) => {
+          const parts = [
+            row.street,
+            row.city ? ', ' + row.city : '',
+            row.zipCode ? ' ' + row.zipCode : '',
+            row.country ? ', ' + row.country : ''
+          ];
+          return parts.filter(Boolean).join('');
+        },
+        header: 'Adres zamieszkania'
+      },
+      {
+        accessorKey: 'street',
+        header: 'Ulica'
+      },
+      {
+        accessorKey: 'city',
+        header: 'Miasto'
+      },
+      {
+        accessorKey: 'zipCode',
+        header: 'Kod pocztowy'
       }
     ],
     [validationErrors]
   );
 
-  const handleCreateUser = async ({ values, table }) => {
-    const newValidationErrors = validateUser(values);
+  const handleCreateEmployee = async ({ values, table }) => {
+    const newValidationErrors = validateEmployee(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
       return;
@@ -116,8 +149,8 @@ export default function Employees() {
     setValidationErrors({});
     setIsSaving(true);
     try {
-      const newUser = await requestWithNotification('post', '/users', values, true);
-      setFetchedUsers((prev) => [...prev, newUser]);
+      const newEmployee = await requestWithNotification('post', '/employees', values, true);
+      setFetchedEmployees((prev) => [...prev, newEmployee]);
       table.setCreatingRow(null);
     } catch (error) {
       // Error handling is done in requestWithNotification
@@ -125,8 +158,8 @@ export default function Employees() {
     setIsSaving(false);
   };
 
-  const handleSaveUser = async ({ values, table }) => {
-    const newValidationErrors = validateUser(values);
+  const handleSaveEmployee = async ({ values, table }) => {
+    const newValidationErrors = validateEmployee(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
       return;
@@ -134,8 +167,10 @@ export default function Employees() {
     setValidationErrors({});
     setIsSaving(true);
     try {
-      await requestWithNotification('put', `/users/${values.id}`, values, true);
-      setFetchedUsers((prev) => prev.map((user) => (user.id === values.id ? values : user)));
+      await requestWithNotification('put', `/employees`, values, true);
+      setFetchedEmployees((prev) =>
+        prev.map((employee) => (employee.id === values.id ? values : employee))
+      );
       table.setEditingRow(null);
     } catch (error) {
       // Error handling is done in requestWithNotification
@@ -144,16 +179,16 @@ export default function Employees() {
   };
 
   const openDeleteConfirmModal = (row) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      handleDeleteUser(row.original.id);
+    if (window.confirm('Are you sure you want to delete this employee?')) {
+      handleDeleteEmployee(row.original.id);
     }
   };
 
-  const handleDeleteUser = async (id) => {
+  const handleDeleteEmployee = async (id) => {
     setIsSaving(true);
     try {
-      await requestWithNotification('delete', `/users/${id}`, {}, true);
-      setFetchedUsers((prev) => prev.filter((user) => user.id !== id));
+      await requestWithNotification('delete', `/employees/${id}`, {}, true);
+      setFetchedEmployees((prev) => prev.filter((employee) => employee.id !== id));
     } catch (error) {
       // Error handling is done in requestWithNotification
     }
@@ -162,12 +197,12 @@ export default function Employees() {
 
   const table = useMaterialReactTable({
     columns,
-    data: fetchedUsers,
+    data: fetchedEmployees,
     createDisplayMode: 'modal',
     editDisplayMode: 'modal',
     enableEditing: true,
     getRowId: (row) => row.id,
-    muiToolbarAlertBannerProps: isLoadingUsersError
+    muiToolbarAlertBannerProps: isLoadingEmployeesError
       ? {
           color: 'error',
           children: 'Error loading data'
@@ -178,15 +213,22 @@ export default function Employees() {
         minHeight: '500px'
       }
     },
+    enableFullScreenToggle: false,
+    enableDensityToggle: false,
+    positionActionsColumn: 'last',
     onCreatingRowCancel: () => setValidationErrors({}),
-    onCreatingRowSave: handleCreateUser,
+    onCreatingRowSave: handleCreateEmployee,
     onEditingRowCancel: () => setValidationErrors({}),
-    onEditingRowSave: handleSaveUser,
+    onEditingRowSave: handleSaveEmployee,
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h3">Create New User</DialogTitle>
+        <DialogTitle variant="h5">Nowy pracownik</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {internalEditComponents}
+          {internalEditComponents.filter(
+            (component) =>
+              !['id', 'age'].includes(component.props.cell.column.columnDef.accessorKey) &&
+              !['Wiek', 'Adres zamieszkania'].includes(component.props.cell.column.columnDef.header)
+          )}
         </DialogContent>
         <DialogActions>
           <MRT_EditActionButtons variant="text" table={table} row={row} />
@@ -195,9 +237,13 @@ export default function Employees() {
     ),
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h3">Edit User</DialogTitle>
+        <DialogTitle variant="h5">Edycja pracownika</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {internalEditComponents}
+          {internalEditComponents.filter(
+            (component) =>
+              !['id', 'age'].includes(component.props.cell.column.columnDef.accessorKey) &&
+              !['Wiek', 'Adres zamieszkania'].includes(component.props.cell.column.columnDef.header)
+          )}
         </DialogContent>
         <DialogActions>
           <MRT_EditActionButtons variant="text" table={table} row={row} />
@@ -224,32 +270,29 @@ export default function Employees() {
         onClick={() => {
           table.setCreatingRow(true);
         }}>
-        Create New User
+        Stwórz pracownika
       </Button>
     ),
     state: {
-      isLoading: isLoadingUsers,
+      isLoading: isLoadingEmployees,
       isSaving,
-      showAlertBanner: isLoadingUsersError
+      showAlertBanner: isLoadingEmployeesError,
+      columnVisibility: { street: false, city: false, zipCode: false, country: false }
     }
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <ThemeProvider theme={muiDialogTheme}>
+      <MaterialReactTable table={table} />
+    </ThemeProvider>
+  );
 }
 
 const validateRequired = (value) => !!value.length;
-const validateEmail = (email) =>
-  !!email.length &&
-  email
-    .toLowerCase()
-    .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    );
 
-function validateUser(user) {
+function validateEmployee(employee) {
   return {
-    firstName: !validateRequired(user.firstName) ? 'First Name is Required' : '',
-    lastName: !validateRequired(user.lastName) ? 'Last Name is Required' : '',
-    email: !validateEmail(user.email) ? 'Incorrect Email Format' : ''
+    firstName: !validateRequired(employee.firstName) ? 'First Name is Required' : '',
+    lastName: !validateRequired(employee.lastName) ? 'Last Name is Required' : ''
   };
 }

@@ -13,15 +13,15 @@ import {
   IconButton,
   Tooltip,
   ListItemText,
-  ListItem,
-  List
+  ListItem
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import positionsTheme from './themes/positionsTheme';
+import muiDialogTheme from './themes/muiDialogTheme';
 import { ThemeProvider } from '@mui/material/styles';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment';
 import Duties from './Duties';
+import List from '@mui/material/List';
 
 export default function Positions() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -80,6 +80,13 @@ export default function Positions() {
           error: !!validationErrors?.status,
           helperText: validationErrors?.status
         }
+      },
+      {
+        accessorFn: (row) => row.dutyList.map((duty) => duty.description).join(', '),
+        //accessorFn used to access nested data, though you could just use dot notation in an accessorKey
+        id: 'dutyList',
+        header: '',
+        hidden: true
       }
     ],
     [validationErrors]
@@ -101,7 +108,7 @@ export default function Positions() {
     setIsSaving(true);
     try {
       const method = isNew ? 'post' : 'put';
-      const url = isNew ? '/positions' : `/positions/${values.pid}`;
+      const url = isNew ? '/positions' : `/positions`;
       const newPosition = await requestWithNotification(method, url, { ...values, dutyList }, true);
       if (isNew) {
         setFetchedPositions((prev) => [...prev, newPosition]);
@@ -142,24 +149,28 @@ export default function Positions() {
       ? { color: 'error', children: 'Error loading data' }
       : undefined,
     muiTableContainerProps: { sx: { minHeight: '500px' } },
+    muiExpandButtonProps: ({ row }) => ({
+      sx: {
+        display:
+          Array.isArray(row.original.dutyList) && row.original.dutyList.length > 0 ? 'flex' : 'none'
+      }
+    }),
     renderDetailPanel: ({ row }) => (
-      <Box sx={{ mb: 1 }}>
-        <List>
-          {Array.isArray(row.original.dutyList) ? (
-            row.original.dutyList.map((duty, index) => (
-              <Box key={index} sx={{ marginBottom: '1px' }}>
-                <ListItem>
-                  <ListItemText primary={duty.description} />
-                </ListItem>
-              </Box>
-            ))
-          ) : (
-            <ListItem>
-              <ListItemText primary="No duties available" />
-            </ListItem>
-          )}
-        </List>
-      </Box>
+      <List sx={{ listStyleType: 'disc' }}>
+        {Array.isArray(row.original.dutyList) && row.original.dutyList.length > 0 ? (
+          row.original.dutyList.map((duty, index) => (
+            <Box key={index}>
+              <ListItem sx={{ display: 'list-item' }}>
+                <ListItemText primary={duty.description} />
+              </ListItem>
+            </Box>
+          ))
+        ) : (
+          <ListItem>
+            <ListItemText primary="No duties available" />
+          </ListItem>
+        )}
+      </List>
     ),
     enableFullScreenToggle: false,
     enableExpandAll: true,
@@ -172,7 +183,7 @@ export default function Positions() {
     onEditingRowSave: handleSavePosition,
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h5">Utwórz stanowisko</DialogTitle>
+        <DialogTitle variant="h5">Nowe stanowisko</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {internalEditComponents.filter(
             (component) =>
@@ -196,7 +207,7 @@ export default function Positions() {
       }, [row]);
       return (
         <>
-          <DialogTitle variant="h5">Edytuj stanowisko</DialogTitle>
+          <DialogTitle variant="h5">Edycja stanowiska</DialogTitle>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {internalEditComponents.filter(
               (component) =>
@@ -237,14 +248,19 @@ export default function Positions() {
     positionActionsColumn: 'last',
     renderTopToolbarCustomActions: ({ table }) => (
       <Button variant="contained" onClick={() => table.setCreatingRow(true)}>
-        Utwórz stanowisko
+        Stwórz stanowisko
       </Button>
     ),
-    state: { isLoading: isLoadingPositions, isSaving, showAlertBanner: isLoadingPositionsError }
+    state: {
+      isLoading: isLoadingPositions,
+      isSaving,
+      showAlertBanner: isLoadingPositionsError,
+      columnVisibility: { dutyList: false }
+    }
   });
 
   return (
-    <ThemeProvider theme={positionsTheme}>
+    <ThemeProvider theme={muiDialogTheme}>
       <MaterialReactTable table={table} />
     </ThemeProvider>
   );

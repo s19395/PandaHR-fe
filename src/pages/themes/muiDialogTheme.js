@@ -1,11 +1,18 @@
 import { createTheme } from '@mui/material/styles';
 
-const positionsTheme = createTheme({
+const muiDialogTheme = createTheme({
   components: {
+    MuiList: {
+      styleOverrides: {
+        root: {
+          padding: '0px 50px'
+        }
+      }
+    },
     MuiListItem: {
       styleOverrides: {
         root: {
-          padding: '3px 5px',
+          padding: '0px 25px',
           '&:hover': {
             backgroundColor: 'rgba(0, 0, 0, 0.04)'
           }
@@ -23,4 +30,4 @@ const positionsTheme = createTheme({
   }
 });
 
-export default positionsTheme;
+export default muiDialogTheme;
