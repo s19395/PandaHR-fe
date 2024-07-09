@@ -13,14 +13,15 @@ import MailIcon from '@mui/icons-material/Mail';
 import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
 import { Link } from 'react-router-dom';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 const drawerWidth = 240;
 
 const items = [
   { text: 'Pracownicy', icon: <PersonIcon />, link: '/employees' },
-  { text: 'Stanowiska', icon: <WorkIcon />, link: '/Positions' },
-  { text: 'Send email', icon: <InboxIcon />, link: '/send-email' },
-  { text: 'Drafts', icon: <InboxIcon />, link: '/drafts' }
+  { text: 'Stanowiska', icon: <WorkIcon />, link: '/positions' },
+  { text: 'Umowy', icon: <DescriptionIcon />, link: '/contracts' }
+  // { text: 'Drafts', icon: <InboxIcon />, link: '/drafts' }
 ];
 
 export default function LeftDrawer() {

@@ -9,6 +9,7 @@ import Employees from '../pages/Employees';
 import * as React from 'react';
 import ErrorPage from '../components/core/ErrorPage';
 import Positions from '../pages/Positions';
+import Contracts from '../pages/Contracts';
 
 const Routes = () => {
   const { token } = useAuth();
@@ -38,6 +39,10 @@ const Routes = () => {
         {
           path: '/positions',
           element: <Positions />
+        },
+        {
+          path: '/contracts',
+          element: <Contracts />
         }
       ],
       errorElement: <ErrorPage />
