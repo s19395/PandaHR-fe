@@ -200,30 +200,33 @@ export default function Employees() {
 
   const table = useMaterialReactTable({
     columns,
-    data: fetchedEmployees,
-    enableRowNumbers: true,
-    enableColumnPinning: true,
     createDisplayMode: 'modal',
+    data: fetchedEmployees,
     editDisplayMode: 'modal',
+    enableColumnPinning: true,
+    enableDensityToggle: false,
     enableEditing: true,
-    muiToolbarAlertBannerProps: isLoadingEmployeesError
-      ? {
-          color: 'error',
-          children: 'Error loading data'
-        }
-      : undefined,
+    enableFullScreenToggle: false,
+    enableRowNumbers: true,
+    initialState: {
+      columnPinning: { left: [], right: ['mrt-row-actions'] }
+    },
     muiTableContainerProps: {
       sx: {
         minHeight: '500px'
       }
     },
-    enableFullScreenToggle: false,
-    enableDensityToggle: false,
-    positionActionsColumn: 'last',
+    muiToolbarAlertBannerProps: isLoadingEmployeesError
+      ? {
+        color: 'error',
+        children: 'Error loading data'
+      }
+      : undefined,
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateEmployee,
     onEditingRowCancel: () => setValidationErrors({}),
     onEditingRowSave: handleSaveEmployee,
+    positionActionsColumn: 'last',
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
         <DialogTitle variant="h5">Nowy pracownik</DialogTitle>
@@ -282,9 +285,6 @@ export default function Employees() {
       isSaving,
       showAlertBanner: isLoadingEmployeesError,
       columnVisibility: { id: false, street: false, city: false, zipCode: false, country: false }
-    },
-    initialState: {
-      columnPinning: { left: [], right: ['mrt-row-actions'] }
     }
   });
 

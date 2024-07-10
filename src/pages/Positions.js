@@ -139,22 +139,50 @@ export default function Positions() {
 
   const table = useMaterialReactTable({
     columns,
-    data: fetchedPositions,
-    enableColumnPinning: true,
     createDisplayMode: 'modal',
+    data: fetchedPositions,
     editDisplayMode: 'modal',
+    enableColumnPinning: true,
+    enableDensityToggle: false,
     enableEditing: true,
+    enableExpandAll: true,
+    enableFullScreenToggle: false,
+    enableStickyFooter: true,
+    enableStickyHeader: true,
     getRowId: (row) => row.id,
-    muiToolbarAlertBannerProps: isLoadingPositionsError
-      ? { color: 'error', children: 'Error loading data' }
-      : undefined,
-    muiTableContainerProps: { sx: { minHeight: '500px' } },
+    initialState: {
+      columnPinning: { left: [], right: ['mrt-row-actions'] }
+    },
     muiExpandButtonProps: ({ row }) => ({
       sx: {
         display:
           Array.isArray(row.original.duties) && row.original.duties.length > 0 ? 'flex' : 'none'
       }
     }),
+    muiTableContainerProps: { sx: { minHeight: '500px' } },
+    muiToolbarAlertBannerProps: isLoadingPositionsError
+      ? { color: 'error', children: 'Error loading data' }
+      : undefined,
+    onCreatingRowCancel: () => setValidationErrors({}),
+    onCreatingRowSave: (props) => handleSavePosition({ ...props, isNew: true }),
+    onEditingRowCancel: () => setValidationErrors({}),
+    onEditingRowSave: handleSavePosition,
+    positionActionsColumn: 'last',
+    renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
+      <>
+        <DialogTitle variant="h5">Nowe stanowisko</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {internalEditComponents.filter(
+            (component) =>
+              !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey)
+          )}
+          <Duties duties={duties} setDuties={setDuties} newDuty={newDuty} setNewDuty={setNewDuty} />
+        </DialogContent>
+        <DialogActions>
+          <MRT_EditActionButtons variant="text" table={table} row={row} />
+        </DialogActions>
+      </>
+    ),
     renderDetailPanel: ({ row }) => (
       <List sx={{ listStyleType: 'disc' }}>
         {Array.isArray(row.original.duties) && row.original.duties.length > 0 ? (
@@ -171,30 +199,6 @@ export default function Positions() {
           </ListItem>
         )}
       </List>
-    ),
-    enableFullScreenToggle: false,
-    enableExpandAll: true,
-    enableStickyHeader: true,
-    enableStickyFooter: true,
-    enableDensityToggle: false,
-    onCreatingRowCancel: () => setValidationErrors({}),
-    onCreatingRowSave: (props) => handleSavePosition({ ...props, isNew: true }),
-    onEditingRowCancel: () => setValidationErrors({}),
-    onEditingRowSave: handleSavePosition,
-    renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
-      <>
-        <DialogTitle variant="h5">Nowe stanowisko</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {internalEditComponents.filter(
-            (component) =>
-              !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey)
-          )}
-          <Duties duties={duties} setDuties={setDuties} newDuty={newDuty} setNewDuty={setNewDuty} />
-        </DialogContent>
-        <DialogActions>
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
-        </DialogActions>
-      </>
     ),
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => {
       useEffect(() => {
@@ -240,7 +244,6 @@ export default function Positions() {
         </Tooltip>
       </Box>
     ),
-    positionActionsColumn: 'last',
     renderTopToolbarCustomActions: ({ table }) => (
       <Button variant="contained" onClick={() => table.setCreatingRow(true)}>
         Stwórz stanowisko
@@ -251,9 +254,6 @@ export default function Positions() {
       isSaving,
       showAlertBanner: isLoadingPositionsError,
       columnVisibility: { duties: false }
-    },
-    initialState: {
-      columnPinning: { left: [], right: ['mrt-row-actions'] }
     }
   });
 
