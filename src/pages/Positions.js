@@ -83,7 +83,7 @@ export default function Positions() {
       },
       {
         accessorFn: (row) => row.dutyList.map((duty) => duty.description).join(', '),
-        //accessorFn used to access nested data, though you could just use dot notation in an accessorKey
+        //accessorFn used to access nested data
         id: 'dutyList',
         header: '',
         hidden: true
