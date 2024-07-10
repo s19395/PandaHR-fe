@@ -218,9 +218,9 @@ export default function Employees() {
     },
     muiToolbarAlertBannerProps: isLoadingEmployeesError
       ? {
-        color: 'error',
-        children: 'Error loading data'
-      }
+          color: 'error',
+          children: 'Error loading data'
+        }
       : undefined,
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateEmployee,
