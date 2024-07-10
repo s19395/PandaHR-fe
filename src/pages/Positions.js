@@ -29,7 +29,7 @@ export default function Positions() {
   const [isLoadingPositions, setIsLoadingPositions] = useState(true);
   const [isLoadingPositionsError, setIsLoadingPositionsError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [dutyList, setDutyList] = useState([]);
+  const [duties, setDuties] = useState([]);
   const [newDuty, setNewDuty] = useState('');
 
   const requestWithNotification = useRequestWithNotification();
@@ -53,7 +53,7 @@ export default function Positions() {
 
   const columns = useMemo(
     () => [
-      { accessorKey: 'pid', header: 'ID', enableEditing: false, size: 80 },
+      { accessorKey: 'pid', header: 'ID', enableEditing: false },
       {
         accessorKey: 'title',
         header: 'Stanowisko',
@@ -82,9 +82,8 @@ export default function Positions() {
         }
       },
       {
-        accessorFn: (row) => row.dutyList.map((duty) => duty.description).join(', '),
-        //accessorFn used to access nested data
-        id: 'dutyList',
+        accessorFn: (row) => row.duties.map((duty) => duty.description).join(', '),
+        id: 'duties',
         header: '',
         hidden: true
       }
@@ -109,7 +108,7 @@ export default function Positions() {
     try {
       const method = isNew ? 'post' : 'put';
       const url = isNew ? '/positions' : `/positions`;
-      const newPosition = await requestWithNotification(method, url, { ...values, dutyList }, true);
+      const newPosition = await requestWithNotification(method, url, { ...values, duties }, true);
       if (isNew) {
         setFetchedPositions((prev) => [...prev, newPosition]);
         table.setCreatingRow(null);
@@ -141,6 +140,7 @@ export default function Positions() {
   const table = useMaterialReactTable({
     columns,
     data: fetchedPositions,
+    enableColumnPinning: true,
     createDisplayMode: 'modal',
     editDisplayMode: 'modal',
     enableEditing: true,
@@ -152,13 +152,13 @@ export default function Positions() {
     muiExpandButtonProps: ({ row }) => ({
       sx: {
         display:
-          Array.isArray(row.original.dutyList) && row.original.dutyList.length > 0 ? 'flex' : 'none'
+          Array.isArray(row.original.duties) && row.original.duties.length > 0 ? 'flex' : 'none'
       }
     }),
     renderDetailPanel: ({ row }) => (
       <List sx={{ listStyleType: 'disc' }}>
-        {Array.isArray(row.original.dutyList) && row.original.dutyList.length > 0 ? (
-          row.original.dutyList.map((duty, index) => (
+        {Array.isArray(row.original.duties) && row.original.duties.length > 0 ? (
+          row.original.duties.map((duty, index) => (
             <Box key={index}>
               <ListItem sx={{ display: 'list-item' }}>
                 <ListItemText primary={duty.description} />
@@ -189,12 +189,7 @@ export default function Positions() {
             (component) =>
               !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey)
           )}
-          <Duties
-            dutyList={dutyList}
-            setDutyList={setDutyList}
-            newDuty={newDuty}
-            setNewDuty={setNewDuty}
-          />
+          <Duties duties={duties} setDuties={setDuties} newDuty={newDuty} setNewDuty={setNewDuty} />
         </DialogContent>
         <DialogActions>
           <MRT_EditActionButtons variant="text" table={table} row={row} />
@@ -203,7 +198,7 @@ export default function Positions() {
     ),
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => {
       useEffect(() => {
-        if (row?.original?.dutyList) setDutyList(row.original.dutyList);
+        if (row?.original?.duties) setDuties(row.original.duties);
       }, [row]);
       return (
         <>
@@ -214,8 +209,8 @@ export default function Positions() {
                 !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey)
             )}
             <Duties
-              dutyList={dutyList}
-              setDutyList={setDutyList}
+              duties={duties}
+              setDuties={setDuties}
               newDuty={newDuty}
               setNewDuty={setNewDuty}
             />
@@ -255,7 +250,10 @@ export default function Positions() {
       isLoading: isLoadingPositions,
       isSaving,
       showAlertBanner: isLoadingPositionsError,
-      columnVisibility: { dutyList: false }
+      columnVisibility: { duties: false }
+    },
+    initialState: {
+      columnPinning: { left: [], right: ['mrt-row-actions'] }
     }
   });
 
