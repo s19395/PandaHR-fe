@@ -140,7 +140,7 @@ const ContractsData = ({ employee }) => {
     setIsSaving(false);
   };
 
-  const columns = useMemo(
+  const columns = React.useMemo(
     () => [
       {
         accessorKey: 'id',
@@ -313,6 +313,7 @@ const ContractsData = ({ employee }) => {
               onClick={() => {
                 setCreatingRowIndex((staticRowIndex || 0) + 1);
                 table.setCreatingRow(
+                  // eslint-disable-next-line no-undef
                   createRow(
                     table,
                     {
