@@ -19,7 +19,16 @@ export const ProtectedRoute = () => {
     <>
       <Navbar />
       <LeftDrawer />
-      <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: '64px' }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          marginTop: '64px',
+          maxWidth: '100%',
+          maxHeight: '100%',
+          overflow: 'auto'
+        }}>
         <Outlet />
       </Box>
     </>
