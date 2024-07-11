@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import { MaterialReactTable, createRow, useMaterialReactTable } from 'material-react-table';
 import { Box, Button, IconButton, Tooltip, darken, lighten } from '@mui/material';
@@ -6,7 +7,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment';
+import { MRT_Localization_PL } from 'material-react-table/locales/pl';
+import { CustomNumericEdit, CustomCheckbox, dateFieldProps } from './mrtEditHelper';
 import Checkbox from '@mui/material/Checkbox';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const ContractsData = () => {
   const [contracts, setContracts] = useState([]);
@@ -44,9 +49,11 @@ const ContractsData = () => {
     setIsSaving(true);
 
     try {
+      const pandaContractDto = transformValuesToPandaContractDto(values);
+
       // Fake API call or actual API call to create a new contract
       const newContract = await requestWithNotification('post', '/contracts', {
-        ...values,
+        ...pandaContractDto,
         parentContractId: row.original.contractId
       });
 
@@ -142,41 +149,22 @@ const ContractsData = () => {
         accessorFn: (row) => moment(row.validFrom).format('DD.MM.YYYY'),
         header: 'Data od',
         id: 'validFrom',
-        muiEditTextFieldProps: {
-          variant: 'standard',
-          type: 'date',
-          InputLabelProps: { shrink: true },
-          inputProps: {
-            min: '1900-01-01'
-          }
-        }
+        filterVariant: 'date-range',
+        muiEditTextFieldProps: dateFieldProps
       },
       {
         accessorFn: (row) => moment(row.validTo).format('DD.MM.YYYY'),
         id: 'validTo',
         header: 'Data do',
-        muiEditTextFieldProps: {
-          variant: 'standard',
-          type: 'date',
-          InputLabelProps: { shrink: true },
-          inputProps: {
-            min: '1900-01-01'
-          }
-        }
+        filterVariant: 'date-range',
+        muiEditTextFieldProps: dateFieldProps
       },
       {
         accessorFn: (row) => moment(row.signedAt).format('DD.MM.YYYY'),
         header: 'Data zawarcia',
         id: 'signedAt',
-        muiEditTextFieldProps: {
-          variant: 'standard',
-          type: 'date',
-          InputLabelProps: { shrink: true },
-          inputProps: {
-            min: '1900-01-01',
-            max: moment().format('YYYY-MM-DD') //
-          }
-        }
+        filterVariant: 'date-range',
+        muiEditTextFieldProps: dateFieldProps
       },
       {
         accessorKey: 'position',
@@ -184,42 +172,29 @@ const ContractsData = () => {
         enableEditing: false
       },
       {
-        accessorKey: 'hourlyRate',
+        accessorKey: 'earningConditionsDto.hourlyRate',
         header: 'Stawka/h',
-        muiEditTextFieldProps: {
-          required: true,
-          type: 'number'
-        }
+        filterVariant: 'autocomplete',
+        Edit: (props) => <CustomNumericEdit {...props} suffix=" zł/h" />
       },
       {
-        accessorKey: 'bonus',
+        accessorKey: 'earningConditionsDto.bonusEnabled',
         header: 'Premia',
-        Cell: ({ cell }) => (
-          <Box display="flex" justifyContent="center" alignItems="center">
-            <Checkbox disabled checked={cell.getValue()} />
-          </Box>
-        ),
-        Edit: ({ value, onChange }) => (
-          <Box display="flex" justifyContent="center" alignItems="center">
-            <Checkbox checked={value} onChange={(e) => onChange(e.target.checked)} />
-          </Box>
-        )
+        filterVariant: 'checkbox',
+        Cell: ({ cell }) => <Checkbox disabled checked={cell.getValue()} />,
+        Edit: CustomCheckbox
       },
       {
-        accessorKey: 'bonus',
+        accessorKey: 'earningConditionsDto.bonus',
+        id: 'bonus',
         header: 'Stawka premii',
-        muiEditTextFieldProps: {
-          required: true,
-          type: 'number'
-        }
+        Cell: ({ cell }) => <span> {cell.getValue()} </span>,
+        Edit: (props) => <CustomNumericEdit {...props} suffix=" zł" />
       },
       {
-        accessorKey: 'bonusThreshold',
+        accessorKey: 'earningConditionsDto.bonusThreshold',
         header: 'Warunek premii',
-        muiEditTextFieldProps: {
-          required: true,
-          type: 'number'
-        }
+        Edit: (props) => <CustomNumericEdit {...props} suffix=" dni" />
       }
     ],
     [validationErrors]
@@ -234,17 +209,27 @@ const ContractsData = () => {
       maxSize: 9001,
       size: 50
     },
+    filterFromLeafRows: true, //search for child rows and preserve parent rows
     editDisplayMode: 'row',
-    enableExpanding: true,
     enableColumnPinning: true,
-    enableEditing: true,
     enableDensityToggle: false,
+    enableEditing: true,
+    enableExpanding: true,
     enableRowNumbers: true,
     initialState: {
       columnPinning: { left: [], right: ['mrt-row-actions'] },
       expanded: false,
       pagination: { pageSize: 20, pageIndex: 0 }
     },
+    localization: MRT_Localization_PL,
+    muiExpandButtonProps: ({ row }) => ({
+      sx: {
+        display:
+          row.depth === 0 && row.original.subRows && row.original.subRows.length > 0
+            ? 'flex'
+            : 'none'
+      }
+    }),
     muiTableBodyRowProps: ({ row }) => ({
       sx: (theme) => ({
         backgroundColor: darken(
@@ -281,30 +266,27 @@ const ContractsData = () => {
             <DeleteIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Add Subordinate">
-          <IconButton
-            onClick={() => {
-              setCreatingRowIndex((staticRowIndex || 0) + 1);
-              table.setCreatingRow(
-                createRow(
-                  table,
-                  {
-                    id: null,
-                    firstName: '',
-                    lastName: '',
-                    city: '',
-                    state: '',
-                    contractId: row.original.id,
-                    subRows: []
-                  },
-                  -1,
-                  row.depth + 1
-                )
-              );
-            }}>
-            <PersonAddAltIcon />
-          </IconButton>
-        </Tooltip>
+        {row.depth === 0 && (
+          <Tooltip title="Stwórz aneks">
+            <IconButton
+              onClick={() => {
+                setCreatingRowIndex((staticRowIndex || 0) + 1);
+                table.setCreatingRow(
+                  createRow(
+                    table,
+                    {
+                      contractId: row.original.id,
+                      subRows: []
+                    },
+                    -1,
+                    row.depth + 1
+                  )
+                );
+              }}>
+              <PersonAddAltIcon />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
     ),
     renderTopToolbarCustomActions: ({ table }) => (
@@ -327,7 +309,11 @@ const ContractsData = () => {
     }
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <MaterialReactTable table={table} />;
+    </LocalizationProvider>
+  );
 };
 
 // const validateRequired = (value) => !!value.length;
@@ -351,6 +337,26 @@ function findContractInTree(contractId, contracts) {
     }
   }
   return null;
+}
+
+function transformValuesToPandaContractDto(values) {
+  const earningConditionsDto = {
+    hourlyRate: values.hourlyRate,
+    bonus: values.bonus,
+    bonusEnabled: values.bonusEnabled,
+    bonusThreshold: values.bonusThreshold
+  };
+
+  return {
+    id: values.id,
+    parentContractId: values.parentContractId,
+    name: values.name,
+    signedAt: values.signedAt,
+    validFrom: values.validFrom,
+    validTo: values.validTo,
+    earningConditionsDto: earningConditionsDto,
+    subRows: values.subRows
+  };
 }
 
 export default ContractsData;
