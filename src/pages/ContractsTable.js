@@ -158,15 +158,19 @@ const ContractsData = ({ employee }) => {
         }
       },
       {
-        accessorFn: (row) => moment(row.validTo).format('DD.MM.YYYY') || '',
+        accessorFn: (row) => (row.validTo ? moment(row.validTo).format('DD.MM.YYYY') : ''),
         id: 'validTo',
         header: 'Data do',
         filterVariant: 'date-range',
-        muiEditTextFieldProps: {
+        muiEditTextFieldProps: ({ row }) => ({
           variant: 'standard',
           type: 'date',
-          InputLabelProps: { shrink: true }
-        }
+          defaultValue: '',
+          InputLabelProps: { shrink: true },
+          sx: {
+            display: row.depth === 0 ? 'flex' : 'none'
+          }
+        })
       },
       {
         accessorFn: (row) => moment(row.signedAt).format('DD.MM.YYYY'),
@@ -381,7 +385,7 @@ function transformValuesToPandaContractDto(values) {
     name: values.name,
     signedAt: moment(values.signedAt).format('YYYY-MM-DD'),
     validFrom: moment(values.validFrom).format('YYYY-MM-DD'),
-    validTo: moment(values.validTo).format('YYYY-MM-DD'),
+    validTo: values.validTo ? moment(values.validTo).format('YYYY-MM-DD') : null,
     earningConditionsDto: earningConditionsDto,
     subRows: values.subRows
   };
