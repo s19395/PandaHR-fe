@@ -19,7 +19,7 @@ const Contract = () => {
       <EmployeeSearch onEmployeeSelect={handleEmployeeSelect} />
       {employee ? (
         <Box sx={{ pt: 2 }}>
-          <ContractsTable />
+          <ContractsTable employee={employee} />
         </Box>
       ) : (
         <Typography sx={{ mt: 2 }} variant="h6">

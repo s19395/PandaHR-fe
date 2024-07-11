@@ -8,12 +8,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
-import { CustomNumericEdit, CustomCheckbox, dateFieldProps } from './mrtEditHelper';
+import { CustomNumeric, CustomCheckbox } from './customEditFields';
 import Checkbox from '@mui/material/Checkbox';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
-const ContractsData = () => {
+const ContractsData = ({ employee }) => {
   const [contracts, setContracts] = useState([]);
   const [creatingRowIndex, setCreatingRowIndex] = useState();
   const [validationErrors, setValidationErrors] = useState({});
@@ -26,7 +26,7 @@ const ContractsData = () => {
   const fetchContracts = async () => {
     try {
       setIsLoadingContracts(true);
-      const data = await requestWithNotification('get', '/contracts/findAll');
+      const data = await requestWithNotification('get', `/contracts/employee/${employee.id}`);
       setContracts(data);
       setIsLoadingContracts(false);
     } catch (error) {
@@ -54,7 +54,8 @@ const ContractsData = () => {
       // Fake API call or actual API call to create a new contract
       const newContract = await requestWithNotification('post', '/contracts', {
         ...pandaContractDto,
-        parentContractId: row.original.contractId
+        parentContractId: row.original.contractId,
+        employeeId: employee.id
       });
 
       // Optimistically update the state
@@ -150,21 +151,33 @@ const ContractsData = () => {
         header: 'Data od',
         id: 'validFrom',
         filterVariant: 'date-range',
-        muiEditTextFieldProps: dateFieldProps
+        muiEditTextFieldProps: {
+          variant: 'standard',
+          type: 'date',
+          InputLabelProps: { shrink: true }
+        }
       },
       {
-        accessorFn: (row) => moment(row.validTo).format('DD.MM.YYYY'),
+        accessorFn: (row) => moment(row.validTo).format('DD.MM.YYYY') || '',
         id: 'validTo',
         header: 'Data do',
         filterVariant: 'date-range',
-        muiEditTextFieldProps: dateFieldProps
+        muiEditTextFieldProps: {
+          variant: 'standard',
+          type: 'date',
+          InputLabelProps: { shrink: true }
+        }
       },
       {
         accessorFn: (row) => moment(row.signedAt).format('DD.MM.YYYY'),
         header: 'Data zawarcia',
         id: 'signedAt',
         filterVariant: 'date-range',
-        muiEditTextFieldProps: dateFieldProps
+        muiEditTextFieldProps: {
+          variant: 'standard',
+          type: 'date',
+          InputLabelProps: { shrink: true }
+        }
       },
       {
         accessorKey: 'position',
@@ -180,7 +193,7 @@ const ContractsData = () => {
         header: 'Stawka/h',
         id: 'hourlyRate',
         filterVariant: 'autocomplete',
-        Edit: (props) => <CustomNumericEdit {...props} suffix=" zł/h" />
+        Edit: (props) => <CustomNumeric {...props} suffix=" zł/h" />
       },
       {
         accessorKey: 'earningConditionsDto.bonusEnabled',
@@ -199,7 +212,7 @@ const ContractsData = () => {
         id: 'bonus',
         header: 'Stawka premii',
         Cell: ({ cell }) => <span> {cell.getValue()} </span>,
-        Edit: (props) => <CustomNumericEdit {...props} suffix=" zł" />
+        Edit: (props) => <CustomNumeric {...props} suffix=" zł" />
       },
       {
         accessorFn: (row) => {
@@ -209,7 +222,7 @@ const ContractsData = () => {
         },
         id: 'bonusThreshold',
         header: 'Warunek premii',
-        Edit: (props) => <CustomNumericEdit {...props} suffix=" dni" />
+        Edit: (props) => <CustomNumeric {...props} suffix=" dni" />
       }
     ],
     [validationErrors]
@@ -233,7 +246,7 @@ const ContractsData = () => {
     enableRowNumbers: true,
     initialState: {
       columnPinning: { left: [], right: ['mrt-row-actions'] },
-      expanded: false,
+      expanded: true,
       pagination: { pageSize: 20, pageIndex: 0 }
     },
     localization: MRT_Localization_PL,
@@ -366,9 +379,9 @@ function transformValuesToPandaContractDto(values) {
     id: values.id,
     parentContractId: values.parentContractId,
     name: values.name,
-    signedAt: values.signedAt,
-    validFrom: values.validFrom,
-    validTo: values.validTo,
+    signedAt: moment(values.signedAt).format('YYYY-MM-DD'),
+    validFrom: moment(values.validFrom).format('YYYY-MM-DD'),
+    validTo: moment(values.validTo).format('YYYY-MM-DD'),
     earningConditionsDto: earningConditionsDto,
     subRows: values.subRows
   };
