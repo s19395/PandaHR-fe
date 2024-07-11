@@ -22,6 +22,7 @@ import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment';
 import Duties from './Duties';
 import List from '@mui/material/List';
+import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 
 export default function Positions() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -153,6 +154,7 @@ export default function Positions() {
     initialState: {
       columnPinning: { left: [], right: ['mrt-row-actions'] }
     },
+    localization: MRT_Localization_PL,
     muiExpandButtonProps: ({ row }) => ({
       sx: {
         display:

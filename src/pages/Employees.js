@@ -19,6 +19,7 @@ import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment/moment';
 import { ThemeProvider } from '@mui/material/styles';
 import muiDialogTheme from './themes/muiDialogTheme';
+import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 
 export default function Employees() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -211,6 +212,7 @@ export default function Employees() {
     initialState: {
       columnPinning: { left: [], right: ['mrt-row-actions'] }
     },
+    localization: MRT_Localization_PL,
     muiTableContainerProps: {
       sx: {
         minHeight: '500px'
