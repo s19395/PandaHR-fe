@@ -10,15 +10,15 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
-const Duties = ({ dutyList, setDutyList, newDuty, setNewDuty }) => {
+const Duties = ({ duties, setDuties, newDuty, setNewDuty }) => {
   const handleAddDuty = () => {
     if (newDuty.trim()) {
-      setDutyList((prev) => [...prev, { description: newDuty }]);
+      setDuties((prev) => [...prev, { description: newDuty }]);
       setNewDuty('');
     }
   };
 
-  const handleRemoveDuty = (index) => setDutyList((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveDuty = (index) => setDuties((prev) => prev.filter((_, i) => i !== index));
 
   return (
     <>
@@ -39,7 +39,7 @@ const Duties = ({ dutyList, setDutyList, newDuty, setNewDuty }) => {
         }}
       />
       <List>
-        {dutyList.map((duty, index) => (
+        {duties.map((duty, index) => (
           <ListItem key={index}>
             <ListItemText primary={duty.description} />
             <ListItemSecondaryAction>

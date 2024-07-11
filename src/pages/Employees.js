@@ -19,6 +19,7 @@ import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment/moment';
 import { ThemeProvider } from '@mui/material/styles';
 import muiDialogTheme from './themes/muiDialogTheme';
+import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 
 export default function Employees() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -50,9 +51,8 @@ export default function Employees() {
     () => [
       {
         accessorKey: 'id',
-        header: 'Id',
-        enableEditing: false,
-        maxSize: 30
+        header: '',
+        editable: false
       },
       {
         accessorKey: 'firstName',
@@ -83,7 +83,10 @@ export default function Employees() {
         }
       },
       {
-        accessorFn: (row) => moment().diff(row.dateOfBirth, 'years'),
+        accessorFn: (row) => {
+          if (!row) return ''; // Ensure row is defined
+          return moment().diff(row.dateOfBirth, 'years');
+        },
         header: 'Wiek',
         maxSize: 30
       },
@@ -114,6 +117,7 @@ export default function Employees() {
       },
       {
         accessorFn: (row) => {
+          if (!row) return ''; // Ensure row is defined
           const parts = [
             row.street,
             row.city ? ', ' + row.city : '',
@@ -180,15 +184,15 @@ export default function Employees() {
 
   const openDeleteConfirmModal = (row) => {
     if (window.confirm('Are you sure you want to delete this employee?')) {
-      handleDeleteEmployee(row.original.id);
+      handleDeleteEmployee(row.original);
     }
   };
 
-  const handleDeleteEmployee = async (id) => {
+  const handleDeleteEmployee = async (deletedEmployee) => {
     setIsSaving(true);
     try {
-      await requestWithNotification('delete', `/employees/${id}`, {}, true);
-      setFetchedEmployees((prev) => prev.filter((employee) => employee.id !== id));
+      await requestWithNotification('delete', `/employees`, deletedEmployee, true);
+      setFetchedEmployees((prev) => prev.filter((employee) => employee.id !== deletedEmployee.id));
     } catch (error) {
       // Error handling is done in requestWithNotification
     }
@@ -197,29 +201,34 @@ export default function Employees() {
 
   const table = useMaterialReactTable({
     columns,
-    data: fetchedEmployees,
     createDisplayMode: 'modal',
+    data: fetchedEmployees,
     editDisplayMode: 'modal',
+    enableColumnPinning: true,
+    enableDensityToggle: false,
     enableEditing: true,
-    getRowId: (row) => row.id,
+    enableFullScreenToggle: false,
+    enableRowNumbers: true,
+    initialState: {
+      columnPinning: { left: [], right: ['mrt-row-actions'] }
+    },
+    localization: MRT_Localization_PL,
+    muiTableContainerProps: {
+      sx: {
+        minHeight: '500px'
+      }
+    },
     muiToolbarAlertBannerProps: isLoadingEmployeesError
       ? {
           color: 'error',
           children: 'Error loading data'
         }
       : undefined,
-    muiTableContainerProps: {
-      sx: {
-        minHeight: '500px'
-      }
-    },
-    enableFullScreenToggle: false,
-    enableDensityToggle: false,
-    positionActionsColumn: 'last',
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateEmployee,
     onEditingRowCancel: () => setValidationErrors({}),
     onEditingRowSave: handleSaveEmployee,
+    positionActionsColumn: 'last',
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
         <DialogTitle variant="h5">Nowy pracownik</DialogTitle>
@@ -241,7 +250,7 @@ export default function Employees() {
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {internalEditComponents.filter(
             (component) =>
-              !['id', 'age'].includes(component.props.cell.column.columnDef.accessorKey) &&
+              !['age'].includes(component.props.cell.column.columnDef.accessorKey) &&
               !['Wiek', 'Adres zamieszkania'].includes(component.props.cell.column.columnDef.header)
           )}
         </DialogContent>
@@ -277,7 +286,7 @@ export default function Employees() {
       isLoading: isLoadingEmployees,
       isSaving,
       showAlertBanner: isLoadingEmployeesError,
-      columnVisibility: { street: false, city: false, zipCode: false, country: false }
+      columnVisibility: { id: false, street: false, city: false, zipCode: false, country: false }
     }
   });
 
