@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useMemo, useState, useEffect } from 'react';
-import { MaterialReactTable, createRow, useMaterialReactTable } from 'material-react-table';
+import { useState, useEffect } from 'react';
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { Box, Button, IconButton, Tooltip, darken, lighten } from '@mui/material';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,8 +14,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const ContractsData = ({ employee }) => {
+  const [positions, setPositions] = useState([]);
   const [contracts, setContracts] = useState([]);
   const [creatingRowIndex, setCreatingRowIndex] = useState();
+  // eslint-disable-next-line no-unused-vars
   const [validationErrors, setValidationErrors] = useState({});
   const [isLoadingContracts, setIsLoadingContracts] = useState(true);
   const [isLoadingContractsError, setIsLoadingContractsError] = useState(false);
@@ -23,21 +25,25 @@ const ContractsData = ({ employee }) => {
 
   const requestWithNotification = useRequestWithNotification();
 
-  const fetchContracts = async () => {
-    try {
-      setIsLoadingContracts(true);
-      const data = await requestWithNotification('get', `/contracts/employee/${employee.id}`);
-      setContracts(data);
-      setIsLoadingContracts(false);
-    } catch (error) {
-      setIsLoadingContractsError(true);
-      setIsLoadingContracts(false);
-    }
-  };
-
   useEffect(() => {
-    fetchContracts();
-  }, []);
+    const fetchData = async () => {
+      try {
+        const [positionsData, contractsData] = await Promise.all([
+          requestWithNotification('get', '/positions/findActive'),
+          requestWithNotification('get', `/contracts/employee/${employee.id}`)
+        ]);
+        setPositions(positionsData);
+        setContracts(contractsData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setIsLoadingContractsError(true);
+      } finally {
+        setIsLoadingContracts(false);
+      }
+    };
+
+    fetchData();
+  }, [employee.id, requestWithNotification]);
 
   const handleCreateContract = async ({ values, row, table }) => {
     const newValidationErrors = validateConracts(values);
@@ -186,7 +192,10 @@ const ContractsData = ({ employee }) => {
       {
         accessorKey: 'position',
         header: 'Stanowisko',
-        enableEditing: false
+        editSelectOptions: positions.map((item) => item.title),
+        muiEditTextFieldProps: {
+          select: true
+        }
       },
       {
         accessorFn: (row) => {
@@ -229,7 +238,7 @@ const ContractsData = ({ employee }) => {
         Edit: (props) => <CustomNumeric {...props} suffix=" dni" />
       }
     ],
-    [validationErrors]
+    [positions]
   );
 
   const table = useMaterialReactTable({
@@ -241,7 +250,7 @@ const ContractsData = ({ employee }) => {
       maxSize: 9001,
       size: 50
     },
-    filterFromLeafRows: true, //search for child rows and preserve parent rows
+    filterFromLeafRows: true,
     editDisplayMode: 'row',
     enableColumnPinning: true,
     enableDensityToggle: false,
@@ -329,7 +338,7 @@ const ContractsData = ({ employee }) => {
           setCreatingRowIndex(table.getRowModel().rows.length);
           table.setCreatingRow(true);
         }}>
-        Create New Contract
+        Utwórz umowę
       </Button>
     ),
     state: {
@@ -343,7 +352,7 @@ const ContractsData = ({ employee }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <MaterialReactTable table={table} />;
+      <MaterialReactTable table={table} />
     </LocalizationProvider>
   );
 };
