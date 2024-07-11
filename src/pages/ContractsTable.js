@@ -116,9 +116,9 @@ const ContractsData = () => {
         const newContracts = JSON.parse(JSON.stringify(prev));
         const contract = findContractInTree(contractId, newContracts);
         if (contract) {
-          const manager = findContractInTree(contract.managerId, newContracts);
-          if (manager) {
-            manager.subRows = manager.subRows?.filter(
+          const parentContract = findContractInTree(contract.parentContractId, newContracts);
+          if (parentContract) {
+            parentContract.subRows = parentContract.subRows?.filter(
               (subContract) => subContract.id !== contract.id
             );
           } else {
@@ -172,27 +172,42 @@ const ContractsData = () => {
         enableEditing: false
       },
       {
-        accessorKey: 'earningConditionsDto.hourlyRate',
+        accessorFn: (row) => {
+          if (!row.earningConditionsDto || !row.earningConditionsDto.hourlyRate) return '';
+
+          return row.earningConditionsDto.hourlyRate + ' zł/h';
+        },
         header: 'Stawka/h',
+        id: 'hourlyRate',
         filterVariant: 'autocomplete',
         Edit: (props) => <CustomNumericEdit {...props} suffix=" zł/h" />
       },
       {
         accessorKey: 'earningConditionsDto.bonusEnabled',
         header: 'Premia',
+        id: 'bonusEnabled',
         filterVariant: 'checkbox',
         Cell: ({ cell }) => <Checkbox disabled checked={cell.getValue()} />,
         Edit: CustomCheckbox
       },
       {
-        accessorKey: 'earningConditionsDto.bonus',
+        accessorFn: (row) => {
+          if (!row.earningConditionsDto || !row.earningConditionsDto.bonus) return '';
+
+          return row.earningConditionsDto.bonus + ' zł/d';
+        },
         id: 'bonus',
         header: 'Stawka premii',
         Cell: ({ cell }) => <span> {cell.getValue()} </span>,
         Edit: (props) => <CustomNumericEdit {...props} suffix=" zł" />
       },
       {
-        accessorKey: 'earningConditionsDto.bonusThreshold',
+        accessorFn: (row) => {
+          if (!row.earningConditionsDto || !row.earningConditionsDto.bonusThreshold) return '';
+
+          return row.earningConditionsDto.bonusThreshold + ' dni';
+        },
+        id: 'bonusThreshold',
         header: 'Warunek premii',
         Edit: (props) => <CustomNumericEdit {...props} suffix=" dni" />
       }
