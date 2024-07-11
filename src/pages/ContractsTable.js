@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
+import { useMemo, useState, useEffect } from 'react';
+import { MaterialReactTable, createRow, useMaterialReactTable } from 'material-react-table';
 import { Box, Button, IconButton, Tooltip, darken, lighten } from '@mui/material';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import EditIcon from '@mui/icons-material/Edit';
@@ -25,25 +25,25 @@ const ContractsData = ({ employee }) => {
 
   const requestWithNotification = useRequestWithNotification();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [positionsData, contractsData] = await Promise.all([
-          requestWithNotification('get', '/positions/findActive'),
-          requestWithNotification('get', `/contracts/employee/${employee.id}`)
-        ]);
-        setPositions(positionsData);
-        setContracts(contractsData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setIsLoadingContractsError(true);
-      } finally {
-        setIsLoadingContracts(false);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const [positionsData, contractsData] = await Promise.all([
+        requestWithNotification('get', '/positions/findActive'),
+        requestWithNotification('get', `/contracts/employee/${employee.id}`)
+      ]);
+      setPositions(positionsData);
+      setContracts(contractsData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setIsLoadingContractsError(true);
+    } finally {
+      setIsLoadingContracts(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
-  }, [employee.id, requestWithNotification]);
+  }, [employee.id]);
 
   const handleCreateContract = async ({ values, row, table }) => {
     const newValidationErrors = validateConracts(values);
@@ -91,7 +91,7 @@ const ContractsData = ({ employee }) => {
     }
   };
 
-  const handleSaveContract = async ({ values, table }) => {
+  const handleSaveContract = async ({ values, table, row }) => {
     const newValidationErrors = validateConracts(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
@@ -100,7 +100,12 @@ const ContractsData = ({ employee }) => {
     setValidationErrors({});
     setIsSaving(true);
     try {
-      await requestWithNotification('put', `/contracts/${values.id}`, values);
+      const pandaContractDto = transformValuesToPandaContractDto(values);
+
+      await requestWithNotification('put', `/contracts`, {
+        ...pandaContractDto,
+        id: row.original.id
+      });
       setContracts((prev) => {
         const newContracts = JSON.parse(JSON.stringify(prev));
         let contract = findContractInTree(values.id, newContracts);
@@ -111,8 +116,10 @@ const ContractsData = ({ employee }) => {
       table.setEditingRow(null);
     } catch (error) {
       /* empty */
+    } finally {
+      await fetchData();
+      setIsSaving(false);
     }
-    setIsSaving(false);
   };
 
   const handleDeleteContract = async (contractId) => {
@@ -140,7 +147,7 @@ const ContractsData = ({ employee }) => {
     setIsSaving(false);
   };
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
         accessorKey: 'id',
@@ -190,12 +197,15 @@ const ContractsData = ({ employee }) => {
         }
       },
       {
-        accessorKey: 'position',
+        accessorKey: 'positionDto.title',
         header: 'Stanowisko',
         editSelectOptions: positions.map((item) => item.title),
-        muiEditTextFieldProps: {
-          select: true
-        }
+        muiEditTextFieldProps: ({ row }) => ({
+          select: true,
+          sx: {
+            display: row.depth === 0 ? 'flex' : 'none'
+          }
+        })
       },
       {
         accessorFn: (row) => {
@@ -250,7 +260,7 @@ const ContractsData = ({ employee }) => {
       maxSize: 9001,
       size: 50
     },
-    filterFromLeafRows: true,
+    filterFromLeafRows: true, //search for child rows and preserve parent rows
     editDisplayMode: 'row',
     enableColumnPinning: true,
     enableDensityToggle: false,
@@ -313,7 +323,6 @@ const ContractsData = ({ employee }) => {
               onClick={() => {
                 setCreatingRowIndex((staticRowIndex || 0) + 1);
                 table.setCreatingRow(
-                  // eslint-disable-next-line no-undef
                   createRow(
                     table,
                     {
@@ -353,7 +362,7 @@ const ContractsData = ({ employee }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <MaterialReactTable table={table} />
+      <MaterialReactTable table={table} />;
     </LocalizationProvider>
   );
 };
