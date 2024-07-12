@@ -12,6 +12,7 @@ import { CustomNumeric, CustomCheckbox } from './customEditFields';
 import Checkbox from '@mui/material/Checkbox';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/pl';
 
 const ContractsData = ({ employee }) => {
   const [positions, setPositions] = useState([]);
@@ -160,10 +161,11 @@ const ContractsData = ({ employee }) => {
         enableEditing: false
       },
       {
-        accessorFn: (row) => moment(row.validFrom).format('DD.MM.YYYY'),
+        accessorFn: (row) => new Date(row.validFrom),
         header: 'Data od',
         id: 'validFrom',
         filterVariant: 'date-range',
+        Cell: ({ cell }) => cell.getValue().toLocaleDateString(),
         muiEditTextFieldProps: {
           variant: 'standard',
           type: 'date',
@@ -171,10 +173,11 @@ const ContractsData = ({ employee }) => {
         }
       },
       {
-        accessorFn: (row) => (row.validTo ? moment(row.validTo).format('DD.MM.YYYY') : ''),
+        accessorFn: (row) => (row.validTo ? new Date(row.validTo) : ''),
         id: 'validTo',
         header: 'Data do',
         filterVariant: 'date-range',
+        Cell: ({ cell }) => (cell.getValue() ? cell.getValue().toLocaleDateString() : ''),
         muiEditTextFieldProps: ({ row }) => ({
           variant: 'standard',
           type: 'date',
@@ -186,10 +189,11 @@ const ContractsData = ({ employee }) => {
         })
       },
       {
-        accessorFn: (row) => moment(row.signedAt).format('DD.MM.YYYY'),
+        accessorFn: (row) => new Date(row.signedAt),
         header: 'Data zawarcia',
         id: 'signedAt',
         filterVariant: 'date-range',
+        Cell: ({ cell }) => cell.getValue().toLocaleDateString(),
         muiEditTextFieldProps: {
           variant: 'standard',
           type: 'date',
@@ -197,7 +201,7 @@ const ContractsData = ({ employee }) => {
         }
       },
       {
-        accessorKey: 'positionDto.title',
+        accessorFn: (row) => row.positionDto?.title || '',
         header: 'Stanowisko',
         editSelectOptions: positions.map((item) => item.title),
         muiEditTextFieldProps: ({ row }) => ({
@@ -219,7 +223,7 @@ const ContractsData = ({ employee }) => {
         Edit: (props) => <CustomNumeric {...props} suffix=" zł/h" />
       },
       {
-        accessorKey: 'earningConditionsDto.bonusEnabled',
+        accessorFn: (row) => row.earningConditionsDto?.bonusEnabled || false,
         header: 'Premia',
         id: 'bonusEnabled',
         filterVariant: 'checkbox',
@@ -361,7 +365,7 @@ const ContractsData = ({ employee }) => {
   });
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
       <MaterialReactTable table={table} />;
     </LocalizationProvider>
   );
