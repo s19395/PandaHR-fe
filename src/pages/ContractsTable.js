@@ -212,14 +212,11 @@ const ContractsData = ({ employee }) => {
         })
       },
       {
-        accessorFn: (row) => {
-          if (!row.earningConditionsDto || !row.earningConditionsDto.hourlyRate) return '';
-
-          return row.earningConditionsDto.hourlyRate + ' zł/h';
-        },
+        accessorFn: (row) => row.earningConditionsDto?.hourlyRate,
         header: 'Stawka/h',
         id: 'hourlyRate',
         filterVariant: 'autocomplete',
+        Cell: ({ cell }) => (cell.getValue() ? cell.getValue() + ' zł/h' : ''),
         Edit: (props) => <CustomNumeric {...props} suffix=" zł/h" />
       },
       {
@@ -231,24 +228,17 @@ const ContractsData = ({ employee }) => {
         Edit: CustomCheckbox
       },
       {
-        accessorFn: (row) => {
-          if (!row.earningConditionsDto || !row.earningConditionsDto.bonus) return '';
-
-          return row.earningConditionsDto.bonus + ' zł/d';
-        },
+        accessorFn: (row) => row.earningConditionsDto?.bonus,
         id: 'bonus',
         header: 'Stawka premii',
-        Cell: ({ cell }) => <span> {cell.getValue()} </span>,
+        Cell: ({ cell }) => (cell.getValue() ? cell.getValue() + ' zł' : ''),
         Edit: (props) => <CustomNumeric {...props} suffix=" zł" />
       },
       {
-        accessorFn: (row) => {
-          if (!row.earningConditionsDto || !row.earningConditionsDto.bonusThreshold) return '';
-
-          return row.earningConditionsDto.bonusThreshold + ' dni';
-        },
+        accessorFn: (row) => row.earningConditionsDto?.bonusThreshold,
         id: 'bonusThreshold',
         header: 'Warunek premii',
+        Cell: ({ cell }) => (cell.getValue() ? cell.getValue() + ' dni' : ''),
         Edit: (props) => <CustomNumeric {...props} suffix=" dni" />
       }
     ],
