@@ -15,7 +15,7 @@ import {
   ListItemText,
   ListItem
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Edit as EditIcon } from '@mui/icons-material';
 import muiDialogTheme from './themes/muiDialogTheme';
 import { ThemeProvider } from '@mui/material/styles';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
@@ -86,7 +86,7 @@ export default function Positions() {
         accessorFn: (row) => row.duties.map((duty) => duty.description).join(', '),
         id: 'duties',
         header: '',
-        hidden: true
+        enableEditing: false
       }
     ],
     [validationErrors]
@@ -98,6 +98,15 @@ export default function Positions() {
     title: !validateRequired(position.title) ? 'Stanowisko jest wymagane' : ''
   });
 
+  function transformValuesToPandaContractDto(values) {
+    return {
+      posId: values.pid,
+      title: values.title,
+      status: values.status,
+      dutyList: duties
+    };
+  }
+
   const handleSavePosition = async ({ values, table, isNew = false }) => {
     const newValidationErrors = validatePosition(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
@@ -107,31 +116,20 @@ export default function Positions() {
     setValidationErrors({});
     setIsSaving(true);
     try {
+      values = transformValuesToPandaContractDto(values);
       const method = isNew ? 'post' : 'put';
       const url = isNew ? '/positions' : `/positions`;
-      const newPosition = await requestWithNotification(method, url, { ...values, duties }, true);
+      const newPosition = await requestWithNotification(method, url, { ...values }, true);
       if (isNew) {
         setFetchedPositions((prev) => [...prev, newPosition]);
         table.setCreatingRow(null);
-        fetchPositions();
       } else {
         setFetchedPositions((prev) =>
           prev.map((position) => (position.pid === values.pid ? values : position))
         );
         table.setEditingRow(null);
-        fetchPositions();
       }
-    } catch (error) {
-      /* empty */
-    }
-    setIsSaving(false);
-  };
-
-  const handleDeletePosition = async (id) => {
-    setIsSaving(true);
-    try {
-      await requestWithNotification('delete', `/positions/${id}`, {}, true);
-      setFetchedPositions((prev) => prev.filter((position) => position.pid !== id));
+      fetchPositions();
     } catch (error) {
       /* empty */
     }
@@ -140,6 +138,9 @@ export default function Positions() {
 
   const table = useMaterialReactTable({
     columns,
+    muiDetailPanelProps: {
+      sx: { padding: '0px 50px' }
+    },
     createDisplayMode: 'modal',
     data: fetchedPositions,
     editDisplayMode: 'modal',
@@ -150,7 +151,6 @@ export default function Positions() {
     enableFullScreenToggle: false,
     enableStickyFooter: true,
     enableStickyHeader: true,
-    getRowId: (row) => row.id,
     initialState: {
       columnPinning: { left: [], right: ['mrt-row-actions'] }
     },
@@ -176,7 +176,8 @@ export default function Positions() {
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {internalEditComponents.filter(
             (component) =>
-              !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey)
+              !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey) &&
+              !['duties'].includes(component.props.cell.column.columnDef.id)
           )}
           <Duties duties={duties} setDuties={setDuties} newDuty={newDuty} setNewDuty={setNewDuty} />
         </DialogContent>
@@ -212,7 +213,8 @@ export default function Positions() {
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {internalEditComponents.filter(
               (component) =>
-                !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey)
+                !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey) &&
+                !['duties'].includes(component.props.cell.column.columnDef.id)
             )}
             <Duties
               duties={duties}
@@ -232,16 +234,6 @@ export default function Positions() {
         <Tooltip title="Edit">
           <IconButton onClick={() => table.setEditingRow(row)}>
             <EditIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Delete">
-          <IconButton
-            color="error"
-            onClick={() =>
-              window.confirm('Are you sure you want to delete this position?') &&
-              handleDeletePosition(row.original.pid)
-            }>
-            <DeleteIcon />
           </IconButton>
         </Tooltip>
       </Box>

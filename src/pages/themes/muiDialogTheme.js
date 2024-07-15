@@ -2,13 +2,6 @@ import { createTheme } from '@mui/material/styles';
 
 const muiDialogTheme = createTheme({
   components: {
-    MuiList: {
-      styleOverrides: {
-        root: {
-          padding: '0px 50px'
-        }
-      }
-    },
     MuiListItem: {
       styleOverrides: {
         root: {
