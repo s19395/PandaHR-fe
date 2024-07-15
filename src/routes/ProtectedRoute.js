@@ -4,6 +4,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Navbar from '../components/core/Navbar';
 import LeftDrawer from '../components/core/LeftDrawer';
+import { Paper } from '@mui/material';
 
 export const ProtectedRoute = () => {
   const { token } = useAuth();
@@ -29,7 +30,9 @@ export const ProtectedRoute = () => {
           maxHeight: '100%',
           overflow: 'auto'
         }}>
-        <Outlet />
+        <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+          <Outlet />
+        </Paper>
       </Box>
     </>
   );

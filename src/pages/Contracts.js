@@ -1,13 +1,10 @@
-// src/pages/Contract.js
-import * as React from 'react';
+import React, { useState } from 'react';
+import { Box, Typography, Grid } from '@mui/material';
 import EmployeeSearch from './EmployeeSearch';
-import { useState } from 'react';
 import ContractsTable from './ContractsTable';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 
-const Contract = () => {
-  const [employee, setEmployee] = useState(null);
+const EmployeeContractsPage = () => {
+  const [employee, setEmployee] = useState();
 
   const handleEmployeeSelect = (employee) => {
     console.log('Selected Employee:', employee);
@@ -16,18 +13,24 @@ const Contract = () => {
 
   return (
     <>
-      <EmployeeSearch onEmployeeSelect={handleEmployeeSelect} />
-      {employee ? (
-        <Box sx={{ pt: 2 }}>
-          <ContractsTable employee={employee} />
-        </Box>
-      ) : (
-        <Typography sx={{ mt: 2 }} variant="h6">
-          Wyszukaj pracownika, aby zobaczyć jego umowy
-        </Typography>
-      )}
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <EmployeeSearch onEmployeeSelect={handleEmployeeSelect} />
+        </Grid>
+        <Grid item xs={12}>
+          {employee ? (
+            <Box sx={{ pt: 2 }}>
+              <ContractsTable employee={employee} />
+            </Box>
+          ) : (
+            <Typography sx={{ mt: 2 }} variant="h6" align="center">
+              Wyszukaj pracownika, aby zobaczyć jego umowy
+            </Typography>
+          )}
+        </Grid>
+      </Grid>
     </>
   );
 };
 
-export default Contract;
+export default EmployeeContractsPage;
