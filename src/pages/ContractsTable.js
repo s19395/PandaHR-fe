@@ -158,7 +158,9 @@ const ContractsData = ({ employee }) => {
       const blob = new Blob([response.data], { type: 'application/octet-stream' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `test.docx`;
+      const contentDisposition = response.headers['content-disposition'];
+      const fileName = contentDisposition.split('filename=')[1].split(';')[0];
+      link.download = fileName;
       link.click();
     } catch (error) {
       console.error('Error generating document:', error);
@@ -342,17 +344,17 @@ const ContractsData = ({ employee }) => {
     positionCreatingRow: creatingRowIndex,
     renderRowActions: ({ row, staticRowIndex, table }) => (
       <Box sx={{ display: 'flex' }}>
-        <Tooltip title="Edit">
+        <Tooltip title="Wygeneruj dokument">
           <IconButton onClick={() => generateDocument(row.original)}>
             <DescriptionIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Edit">
+        <Tooltip title="Edytuj">
           <IconButton onClick={() => table.setEditingRow(row)}>
             <EditIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Delete">
+        <Tooltip title="Usuń">
           <IconButton color="error" onClick={() => handleDeleteContract(row.original.id)}>
             <DeleteIcon />
           </IconButton>
