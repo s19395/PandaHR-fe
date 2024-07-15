@@ -13,6 +13,8 @@ import Checkbox from '@mui/material/Checkbox';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/pl';
+import DescriptionIcon from '@mui/icons-material/Description';
+import axios from 'axios';
 
 const ContractsData = ({ employee }) => {
   const [positions, setPositions] = useState([]);
@@ -146,6 +148,22 @@ const ContractsData = ({ employee }) => {
       /* empty */
     }
     setIsSaving(false);
+  };
+
+  const generateDocument = async (values) => {
+    try {
+      const response = await axios.get(`/contracts/generate/${values.id}`, {
+        responseType: 'blob'
+      });
+      const blob = new Blob([response.data], { type: 'application/octet-stream' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `test.docx`;
+      link.click();
+    } catch (error) {
+      console.error('Error generating document:', error);
+      alert(`Error: ${error.message}`);
+    }
   };
 
   function transformValuesToPandaContractDto(values) {
@@ -324,6 +342,11 @@ const ContractsData = ({ employee }) => {
     positionCreatingRow: creatingRowIndex,
     renderRowActions: ({ row, staticRowIndex, table }) => (
       <Box sx={{ display: 'flex' }}>
+        <Tooltip title="Edit">
+          <IconButton onClick={() => generateDocument(row.original)}>
+            <DescriptionIcon />
+          </IconButton>
+        </Tooltip>
         <Tooltip title="Edit">
           <IconButton onClick={() => table.setEditingRow(row)}>
             <EditIcon />
