@@ -148,6 +148,29 @@ const ContractsData = ({ employee }) => {
     setIsSaving(false);
   };
 
+  function transformValuesToPandaContractDto(values) {
+    const positionDto = positions.find((position) => position.title === values.positionTitle);
+
+    const earningConditionsDto = {
+      hourlyRate: values.hourlyRate,
+      bonus: values.bonus,
+      bonusEnabled: values.bonusEnabled,
+      bonusThreshold: values.bonusThreshold
+    };
+
+    return {
+      id: values.id,
+      parentContractId: values.parentContractId,
+      name: values.name,
+      signedAt: moment(values.signedAt).format('YYYY-MM-DD'),
+      validFrom: moment(values.validFrom).format('YYYY-MM-DD'),
+      validTo: values.validTo ? moment(values.validTo).format('YYYY-MM-DD') : null,
+      earningConditionsDto: earningConditionsDto,
+      positionDto: positionDto,
+      subRows: values.subRows
+    };
+  }
+
   const columns = useMemo(
     () => [
       {
@@ -181,7 +204,6 @@ const ContractsData = ({ employee }) => {
         muiEditTextFieldProps: ({ row }) => ({
           variant: 'standard',
           type: 'date',
-          defaultValue: '',
           InputLabelProps: { shrink: true },
           sx: {
             display: row.depth === 0 ? 'flex' : 'none'
@@ -203,6 +225,7 @@ const ContractsData = ({ employee }) => {
       {
         accessorFn: (row) => row.positionDto?.title || '',
         header: 'Stanowisko',
+        id: 'positionTitle',
         editSelectOptions: positions.map((item) => item.title),
         muiEditTextFieldProps: ({ row }) => ({
           select: true,
@@ -382,26 +405,6 @@ function findContractInTree(contractId, contracts) {
     }
   }
   return null;
-}
-
-function transformValuesToPandaContractDto(values) {
-  const earningConditionsDto = {
-    hourlyRate: values.hourlyRate,
-    bonus: values.bonus,
-    bonusEnabled: values.bonusEnabled,
-    bonusThreshold: values.bonusThreshold
-  };
-
-  return {
-    id: values.id,
-    parentContractId: values.parentContractId,
-    name: values.name,
-    signedAt: moment(values.signedAt).format('YYYY-MM-DD'),
-    validFrom: moment(values.validFrom).format('YYYY-MM-DD'),
-    validTo: values.validTo ? moment(values.validTo).format('YYYY-MM-DD') : null,
-    earningConditionsDto: earningConditionsDto,
-    subRows: values.subRows
-  };
 }
 
 export default ContractsData;
