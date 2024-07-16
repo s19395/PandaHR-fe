@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
-const muiDialogTheme = createTheme({
+const materialReactTableTheme = createTheme({
   components: {
     MuiListItem: {
       styleOverrides: {
@@ -23,4 +23,4 @@ const muiDialogTheme = createTheme({
   }
 });
 
-export default muiDialogTheme;
+export default materialReactTableTheme;

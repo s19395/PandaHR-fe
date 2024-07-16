@@ -12,7 +12,7 @@ import WorkIcon from '@mui/icons-material/Work';
 import { Link } from 'react-router-dom';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
-import CreateEmployee from '../../pages/NewEmployeeForm';
+import CreateEmployee from '../../pages/EmployeeForm';
 
 const drawerWidth = 240;
 

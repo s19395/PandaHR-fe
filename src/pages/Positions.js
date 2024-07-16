@@ -16,7 +16,7 @@ import {
   ListItem
 } from '@mui/material';
 import { Edit as EditIcon } from '@mui/icons-material';
-import muiDialogTheme from './themes/muiDialogTheme';
+import materialReactTableTheme from './themes/MaterialReactTableTheme';
 import { ThemeProvider } from '@mui/material/styles';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment';
@@ -252,7 +252,7 @@ export default function Positions() {
   });
 
   return (
-    <ThemeProvider theme={muiDialogTheme}>
+    <ThemeProvider theme={materialReactTableTheme}>
       <MaterialReactTable table={table} />
     </ThemeProvider>
   );
