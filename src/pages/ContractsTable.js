@@ -8,7 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
-import { CustomNumeric, CustomCheckbox } from './customEditFields';
+import { CustomNumeric, CustomCheckbox } from './CustomFields';
 import Checkbox from '@mui/material/Checkbox';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';

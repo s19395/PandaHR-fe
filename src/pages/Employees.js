@@ -18,7 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment/moment';
 import { ThemeProvider } from '@mui/material/styles';
-import muiDialogTheme from './themes/muiDialogTheme';
+import materialReactTableTheme from './themes/MaterialReactTableTheme';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 
 export default function Employees() {
@@ -291,7 +291,7 @@ export default function Employees() {
   });
 
   return (
-    <ThemeProvider theme={muiDialogTheme}>
+    <ThemeProvider theme={materialReactTableTheme}>
       <MaterialReactTable table={table} />
     </ThemeProvider>
   );

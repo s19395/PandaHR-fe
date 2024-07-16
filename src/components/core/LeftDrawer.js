@@ -1,30 +1,39 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
 import { Link } from 'react-router-dom';
 import DescriptionIcon from '@mui/icons-material/Description';
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
+import CreateEmployee from '../../pages/EmployeeForm';
 
 const drawerWidth = 240;
 
 const items = [
+  { text: 'Nowy pracownik', icon: <PersonAddAlt1Icon />, action: 'openPopup' },
   { text: 'Pracownicy', icon: <PersonIcon />, link: '/employees' },
   { text: 'Stanowiska', icon: <WorkIcon />, link: '/positions' },
   { text: 'Umowy', icon: <DescriptionIcon />, link: '/contracts' }
-  // { text: 'Drafts', icon: <InboxIcon />, link: '/drafts' }
 ];
 
 export default function LeftDrawer() {
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <>
       <Drawer
@@ -37,21 +46,13 @@ export default function LeftDrawer() {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {items.map(({ text, icon, link }) => (
+            {items.map(({ text, icon, link, action }) => (
               <ListItem key={text} disablePadding>
-                <ListItemButton component={Link} to={link} key={text}>
+                <ListItemButton
+                  component={link ? Link : 'button'}
+                  to={link ? link : undefined}
+                  onClick={action === 'openPopup' ? handleOpen : undefined}>
                   <ListItemIcon>{icon}</ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
-          <List>
-            {['All mail', 'Trash', 'Spam'].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
                   <ListItemText primary={text} />
                 </ListItemButton>
               </ListItem>
@@ -59,6 +60,7 @@ export default function LeftDrawer() {
           </List>
         </Box>
       </Drawer>
+      <CreateEmployee open={open} onClose={handleClose} />
     </>
   );
 }
