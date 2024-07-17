@@ -8,10 +8,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import Typography from '@mui/material/Typography';
-import dayjs from 'dayjs';
-import updateLocale from 'dayjs/plugin/updateLocale';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 
 export default function Timesheet() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -21,30 +20,40 @@ export default function Timesheet() {
   const [isSaving, setIsSaving] = useState(false);
   const requestWithNotification = useRequestWithNotification();
 
-  dayjs.extend(updateLocale);
+  setUpDayJs();
 
-  dayjs.updateLocale('pl', {
-    months: [
-      'Styczeń',
-      'Luty',
-      'Marzec',
-      'Kwiecień',
-      'Maj',
-      'Czerwiec',
-      'Lipiec',
-      'Sierpień',
-      'Wrzesień',
-      'Październik',
-      'Listopad',
-      'Grudzień'
-    ]
-  });
+  const data = [
+    {
+      id: 1,
+      lastName: 'Kowalski',
+      firstName: 'Jan',
+      month: new Date('2024-07-12'),
+      workedHours: 160,
+      workedWeekends: 4
+    },
+    {
+      id: 2,
+      lastName: 'Nowak',
+      firstName: 'Anna',
+      month: new Date('2024-07-12'),
+      workedHours: 160,
+      workedWeekends: 4
+    },
+    {
+      id: 3,
+      lastName: 'Wiśniewski',
+      firstName: 'Piotr',
+      month: new Date('2024-05-12'),
+      workedHours: 160,
+      workedWeekends: 4
+    }
+  ];
 
   useEffect(() => {
     const fetchTimesheets = async () => {
       try {
         setIsLoadingTimesheets(true);
-        const data = await requestWithNotification('get', '/employees/findAll');
+        //const data = await requestWithNotification('get', '/employees/findAll');
         setFetchedTimesheets(data);
         setIsLoadingTimesheets(false);
       } catch (error) {
@@ -66,26 +75,44 @@ export default function Timesheet() {
       {
         accessorKey: 'lastName',
         header: 'Last Name',
-        editable: false
+        editable: false,
+        filterVariant: 'multi-select',
+        filter: 'includesSome'
       },
       {
         accessorKey: 'firstName',
         header: 'First Name',
-        editable: false
+        editable: false,
+        filterVariant: 'multi-select',
+        filter: 'includesSome'
       },
       {
-        accessorFn: () => new Date().toLocaleString('pl', { month: 'long' }),
+        accessorFn: (row) => dayjs(row.month).format('MMMM'),
         id: 'month',
         header: 'Miesiąc',
-        editable: false
+        editable: false,
+        filterVariant: 'multi-select',
+        filter: 'includesSome'
+      },
+      {
+        accessorFn: (row) => dayjs(row.year).year(),
+        id: 'year',
+        header: 'Rok',
+        editable: false,
+        filterVariant: 'multi-select',
+        filter: 'includesSome'
       },
       {
         accessorKey: 'workedHours',
-        header: 'Przepracowane godziny'
+        header: 'Godziny',
+        filterVariant: 'range',
+        filterFn: 'between'
       },
       {
         accessorKey: 'workedWeekends',
-        header: 'Przepracowane dni weekendowe'
+        header: 'Dni weekendowe',
+        filterVariant: 'range',
+        filterFn: 'between'
       }
     ],
     [validationErrors]
@@ -133,6 +160,8 @@ export default function Timesheet() {
   const table = useMaterialReactTable({
     columns,
     data: fetchedTimesheets,
+    enableGrouping: true,
+    enableFacetedValues: true,
     createDisplayMode: 'row',
     editDisplayMode: 'row',
     enableColumnPinning: true,
@@ -194,8 +223,8 @@ export default function Timesheet() {
     state: {
       isLoading: isLoadingTimesheets,
       isSaving,
-      showAlertBanner: isLoadingTimesheetsError
-      //columnVisibility: { id: false, street: false, city: false, zipCode: false, country: false }
+      showAlertBanner: isLoadingTimesheetsError,
+      columnVisibility: { id: false }
     }
   });
 
@@ -239,3 +268,9 @@ export const UploadPopUp = () => {
     </>
   );
 };
+
+function setUpDayJs() {
+  const localeData = require('dayjs/plugin/localeData');
+  dayjs.locale('pl');
+  dayjs.extend(localeData);
+}
