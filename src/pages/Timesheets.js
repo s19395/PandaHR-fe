@@ -2,7 +2,18 @@ import React from 'react';
 import FileUpload from '../components/common/FileUpload';
 import { useMemo, useState, useEffect } from 'react';
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
-import { Box, Button, Dialog, DialogContent, IconButton, Tooltip } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  TextField,
+  Tooltip
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
@@ -11,6 +22,8 @@ import Typography from '@mui/material/Typography';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import EmployeeSearch from './EmployeeSearch';
+import { DatePicker } from '@mui/x-date-pickers';
 
 export default function Timesheet() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -533,7 +546,7 @@ export default function Timesheet() {
     enableGrouping: true,
     enableGlobalFilter: false,
     enableFacetedValues: true,
-    createDisplayMode: 'row',
+    createDisplayMode: 'modal',
     editDisplayMode: 'row',
     enableColumnPinning: true,
     enableDensityToggle: false,
@@ -556,7 +569,6 @@ export default function Timesheet() {
         }
       : undefined,
     onCreatingRowCancel: () => setValidationErrors({}),
-    // onCreatingRowSave: handleCreateEmployee,
     onEditingRowCancel: () => setValidationErrors({}),
     onEditingRowSave: handleSaveTimesheet,
     positionActionsColumn: 'last',
@@ -590,6 +602,9 @@ export default function Timesheet() {
           </Button>
         </Box>
       </Box>
+    ),
+    renderCreateRowDialogContent: ({ table, row }) => (
+      <CustomCreateRowDialog table={table} row={row} />
     ),
     state: {
       isLoading: isLoadingTimesheets,
@@ -636,6 +651,102 @@ export const UploadPopUp = () => {
           <FileUpload />
         </DialogContent>
       </Dialog>
+    </>
+  );
+};
+
+const CustomCreateRowDialog = ({ table }) => {
+  const [formValues, setFormValues] = useState({});
+  const requestWithNotification = useRequestWithNotification();
+  const [employee, setEmployee] = useState();
+  const [date, setDate] = useState();
+
+  const handleEmployeeSelect = (employee) => {
+    setEmployee(employee);
+  };
+
+  const handleChange = (field) => (event) => {
+    setFormValues({ ...formValues, [field]: event.target.value });
+  };
+
+  const handleSave = async () => {
+    const employeeDto = {
+      id: employee.id
+    };
+
+    const timesheetDto = {
+      date: date,
+      workedWeekends: formValues.workedWeekends,
+      workedHours: formValues.workedHours
+    };
+
+    await requestWithNotification(
+      'post',
+      `/timesheet/create`,
+      {
+        timesheetDto,
+        employeeDto
+      },
+      true
+    );
+    table.setCreatingRow(false);
+  };
+
+  return (
+    <>
+      <DialogTitle>Nowy czas pracy</DialogTitle>
+      <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <EmployeeSearch onEmployeeSelect={handleEmployeeSelect} />
+        <DatePicker
+          label="Miesiąc i rok"
+          views={['month', 'year']}
+          onChange={(newValue) => setDate(newValue)}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              fullWidth
+              margin="normal"
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          )}
+        />
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <TextField
+              label="Godziny"
+              type="number"
+              fullWidth
+              value={formValues.workedHours}
+              onChange={handleChange('workedHours')}
+              margin="normal"
+              InputProps={{
+                inputProps: { min: 0, max: 280 }
+              }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Dni weekendowe"
+              type="number"
+              fullWidth
+              value={formValues.workedWeekends}
+              onChange={handleChange('workedWeekends')}
+              margin="normal"
+              InputProps={{
+                inputProps: { min: 0, max: 10 }
+              }}
+            />
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => table.setCreatingRow(false)}>Cancel</Button>
+        <Button variant="contained" color="primary" onClick={handleSave}>
+          Save
+        </Button>
+      </DialogActions>
     </>
   );
 };
