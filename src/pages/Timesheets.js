@@ -8,6 +8,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import Typography from '@mui/material/Typography';
+import dayjs from 'dayjs';
+import updateLocale from 'dayjs/plugin/updateLocale';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 export default function Timesheet() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -16,6 +20,25 @@ export default function Timesheet() {
   const [isLoadingTimesheetsError, setIsLoadingTimesheetsError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const requestWithNotification = useRequestWithNotification();
+
+  dayjs.extend(updateLocale);
+
+  dayjs.updateLocale('pl', {
+    months: [
+      'Styczeń',
+      'Luty',
+      'Marzec',
+      'Kwiecień',
+      'Maj',
+      'Czerwiec',
+      'Lipiec',
+      'Sierpień',
+      'Wrzesień',
+      'Październik',
+      'Listopad',
+      'Grudzień'
+    ]
+  });
 
   useEffect(() => {
     const fetchTimesheets = async () => {
@@ -51,7 +74,7 @@ export default function Timesheet() {
         editable: false
       },
       {
-        accessorFn: 'month',
+        accessorFn: () => new Date().toLocaleString('pl', { month: 'long' }),
         id: 'month',
         header: 'Miesiąc',
         editable: false
@@ -177,9 +200,9 @@ export default function Timesheet() {
   });
 
   return (
-    <>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
       <MaterialReactTable table={table} />
-    </>
+    </LocalizationProvider>
   );
 }
 
