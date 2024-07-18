@@ -29,7 +29,7 @@ export default function Employees() {
   const [isSaving, setIsSaving] = useState(false);
   const requestWithNotification = useRequestWithNotification();
 
-  const employmentContracts = ['Pełny etat', 'Zlecenie', 'Brak umowy'];
+  const employmentContracts = ['', 'Umowa Zlecenie', 'Umowa o Pracę'];
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -97,6 +97,8 @@ export default function Employees() {
         muiEditTextFieldProps: {
           variant: 'standard',
           type: 'date',
+          error: !!validationErrors?.dateOfBirth,
+          helperText: validationErrors?.dateOfBirth,
           InputLabelProps: { shrink: true },
           inputProps: {
             min: '1900-01-01',
@@ -130,15 +132,27 @@ export default function Employees() {
       },
       {
         accessorKey: 'street',
-        header: 'Ulica'
+        header: 'Ulica',
+        muiEditTextFieldProps: {
+          error: !!validationErrors?.street,
+          helperText: validationErrors?.street
+        }
       },
       {
         accessorKey: 'city',
-        header: 'Miasto'
+        header: 'Miasto',
+        muiEditTextFieldProps: {
+          error: !!validationErrors?.city,
+          helperText: validationErrors?.city
+        }
       },
       {
         accessorKey: 'zipCode',
-        header: 'Kod pocztowy'
+        header: 'Kod pocztowy',
+        muiEditTextFieldProps: {
+          error: !!validationErrors?.zipCode,
+          helperText: validationErrors?.zipCode
+        }
       }
     ],
     [validationErrors]
@@ -300,8 +314,34 @@ export default function Employees() {
 const validateRequired = (value) => !!value.length;
 
 function validateEmployee(employee) {
+  let dateOfBirth = '';
+  let city = '';
+  let zipCode = '';
+  let street = '';
+
+  console.log(employee);
+
+  if (employee.employmentContract === 'Umowa Zlecenie') {
+    dateOfBirth = !validateRequired(employee.dateOfBirth)
+      ? `Data urodzenia jest wymagana dla ${employee.employmentContract}`
+      : '';
+    city = !validateRequired(employee.city)
+      ? `Miasto jest wymagane dla ${employee.employmentContract}`
+      : '';
+    zipCode = !validateRequired(employee.zipCode)
+      ? `Kod pocztowy wymagany dla ${employee.employmentContract}`
+      : '';
+    street = !validateRequired(employee.street)
+      ? `Ulica jest wymagana dla ${employee.employmentContract}`
+      : '';
+  }
+
   return {
-    firstName: !validateRequired(employee.firstName) ? 'First Name is Required' : '',
-    lastName: !validateRequired(employee.lastName) ? 'Last Name is Required' : ''
+    firstName: !validateRequired(employee.firstName) ? 'Imię jest wymagane' : '',
+    lastName: !validateRequired(employee.lastName) ? 'Nazwisko jest wymagane' : '',
+    dateOfBirth,
+    city,
+    zipCode,
+    street
   };
 }
