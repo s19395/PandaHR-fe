@@ -1,7 +1,11 @@
 import React from 'react';
 import FileUpload from '../components/common/FileUpload';
 import { useMemo, useState, useEffect } from 'react';
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
+import {
+  MaterialReactTable,
+  MRT_EditActionButtons,
+  useMaterialReactTable
+} from 'material-react-table';
 import {
   Box,
   Button,
@@ -9,7 +13,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
   IconButton,
   TextField,
   Tooltip
@@ -39,7 +42,15 @@ export default function Timesheet() {
     try {
       setIsLoadingTimesheets(true);
       const data = await requestWithNotification('get', '/timesheet/findAll');
-      setFetchedTimesheets(data);
+      const timesheet = data.map((timesheet) => ({
+        id: timesheet.timesheetDto?.id || '',
+        date: timesheet.timesheetDto?.date || '',
+        workedHours: timesheet.timesheetDto?.workedHours || 0,
+        workedWeekends: timesheet.timesheetDto?.workedWeekends || 0,
+        firstName: timesheet.employeeDto?.firstName || '',
+        lastName: timesheet.employeeDto?.lastName || ''
+      }));
+      setFetchedTimesheets(timesheet);
       setIsLoadingTimesheets(false);
     } catch (error) {
       setIsLoadingTimesheetsError(true);
@@ -54,59 +65,98 @@ export default function Timesheet() {
   const columns = useMemo(
     () => [
       {
-        accessorFn: (row) => (row.timesheetDto ? row.timesheetDto.id : ''),
-        id: 'id',
+        accessorKey: 'id',
         header: '',
         editable: false
       },
       {
-        accessorFn: (row) => (row.employeeDto ? row.employeeDto.lastName : ''),
-        id: 'lastName',
+        accessorKey: 'lastName',
         header: 'Last Name',
         editable: false,
         filterVariant: 'multi-select'
       },
       {
-        accessorFn: (row) => (row.employeeDto ? row.employeeDto.firstName : ''),
-        id: 'firstName',
+        accessorKey: 'firstName',
         header: 'First Name',
         editable: false,
         filterVariant: 'multi-select'
       },
       {
-        accessorFn: (row) =>
-          row.timesheetDto ? dayjs(row.timesheetDto.date).format('MMMM').toString() : '',
+        accessorFn: (row) => (row.date ? dayjs(row.date).format('MMMM').toString() : ''),
         id: 'month',
         header: 'Miesiąc',
         editable: false,
         filterVariant: 'multi-select'
       },
       {
-        accessorFn: (row) =>
-          row.timesheetDto ? dayjs(row.timesheetDto.date).year().toString() : '',
+        accessorFn: (row) => (row.date ? dayjs(row.date).year().toString() : ''),
         id: 'year',
         header: 'Rok',
         editable: false,
         filterVariant: 'multi-select'
       },
       {
-        accessorFn: (row) => (row.timesheetDto ? row.timesheetDto.workedHours : ''),
-        id: 'workedHours',
-        header: 'Godziny',
-        filterVariant: 'range'
+        accessorKey: 'date',
+        id: 'date',
+        header: 'date',
+        Edit: ({ column, row }) => {
+          return (
+            <DatePicker
+              label="Miesiąc i rok"
+              views={['month', 'year']}
+              defaultValue={dayjs(row._valuesCache.date)}
+              onChange={(newValue) => (row._valuesCache[column.id] = newValue)}
+              sx={{ mt: 2 }}
+            />
+          );
+        }
       },
       {
-        accessorFn: (row) => (row.timesheetDto ? row.timesheetDto.workedWeekends : ''),
-        id: 'workedWeekends',
+        accessorKey: 'workedHours',
+        header: 'Godziny',
+        filterVariant: 'range',
+        Edit: ({ column, row }) => {
+          return (
+            <TextField
+              label="Godziny"
+              type="number"
+              fullWidth
+              defaultValue={row._valuesCache.workedHours}
+              onChange={(newValue) => (row._valuesCache[column.id] = Number(newValue.target.value))}
+              margin="normal"
+              InputProps={{
+                inputProps: { min: 0, max: 280 }
+              }}
+            />
+          );
+        }
+      },
+      {
+        // accessorFn: (row) => (row.timesheetDto ? row.timesheetDto.workedWeekends : ''),
+        accessorKey: 'workedWeekends',
         header: 'Dni weekendowe',
-        filterVariant: 'range'
+        filterVariant: 'range',
+        Edit: ({ column, row }) => {
+          return (
+            <TextField
+              label="Dni weekendowe"
+              type="number"
+              fullWidth
+              defaultValue={row._valuesCache.workedWeekends}
+              onChange={(newValue) => (row._valuesCache[column.id] = Number(newValue.target.value))}
+              margin="normal"
+              InputProps={{
+                inputProps: { min: 0, max: 10 }
+              }}
+            />
+          );
+        }
       }
     ],
     [validationErrors]
   );
 
-  const handleSaveTimesheet = async ({ row, values, table }) => {
-    console.log('values', values);
+  const handleCreateTimesheet = async ({ row, values, table }) => {
     const newValidationErrors = validateTimesheet(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
@@ -116,33 +166,74 @@ export default function Timesheet() {
     setIsSaving(true);
     try {
       const timesheetDto = {
-        id: row.original.timesheetDto.id,
-        date: dayjs(`${values.year} ${values.month}`, 'YYYY MMMM', 'pl').add(1, 'month').toDate(),
-        workedHours: values.workedHours,
-        workedWeekends: values.workedWeekends
+        date: values.date,
+        workedWeekends: values.workedWeekends,
+        workedHours: values.workedHours
       };
-      console.log(timesheetDto);
-      await requestWithNotification('put', `/timesheet`, timesheetDto, true);
+
+      const employeeDto = {
+        id: row.original.employeeId.id
+      };
+
+      const timesheet = {
+        id: values?.id || '',
+        date: values?.date || '',
+        workedHours: values?.workedHours || 0,
+        workedWeekends: values?.workedWeekends || 0,
+        firstName: row?.original.employeeId.firstName || '',
+        lastName: row?.original.employeeId.lastName || ''
+      };
+
+      await requestWithNotification(
+        'post',
+        `/timesheet/create`,
+        { timesheetDto, employeeDto },
+        true
+      );
+
+      setFetchedTimesheets((prev) => [...prev, timesheet]);
+      table.setCreatingRow(null);
+    } catch (error) {
+      // Error handling is done in requestWithNotification
+    }
+    setIsSaving(false);
+  };
+
+  const handleSaveTimesheet = async ({ row, values, table }) => {
+    const newValidationErrors = validateTimesheet(values);
+    if (Object.values(newValidationErrors).some((error) => error)) {
+      setValidationErrors(newValidationErrors);
+      return;
+    }
+    setValidationErrors({});
+    setIsSaving(true);
+    values = {
+      ...values,
+      id: row.original.id
+    };
+    try {
+      await requestWithNotification('put', `/timesheet`, values, true);
+      setFetchedTimesheets((prev) =>
+        prev.map((timesheet) => (timesheet.id === row.original.id ? values : timesheet))
+      );
       table.setEditingRow(null);
     } catch (error) {
       // Error handling is done in requestWithNotification
     }
     setIsSaving(false);
-    fetchTimesheets();
   };
 
   const openDeleteConfirmModal = (row) => {
-    if (window.confirm('Are you sure you want to delete this employee?')) {
-      handleDeleteTimesheet(row.original.timesheetDto.id);
+    if (window.confirm('Czy napewno chcesz usunąć tę ewidencje?')) {
+      handleDeleteTimesheet(row.original.id);
     }
   };
 
   const handleDeleteTimesheet = async (timesheetId) => {
     setIsSaving(true);
-    console.log(timesheetId);
     try {
       await requestWithNotification('delete', `/timesheet/${timesheetId}`, {}, true);
-      fetchTimesheets();
+      setFetchedTimesheets((prev) => prev.filter((timesheet) => timesheet.id !== timesheetId));
     } catch (error) {
       // Error handling is done in requestWithNotification
     }
@@ -151,16 +242,16 @@ export default function Timesheet() {
 
   const table = useMaterialReactTable({
     columns,
-    data: fetchedTimesheets,
-    enableGrouping: true,
-    enableGlobalFilter: false,
-    enableFacetedValues: true,
     createDisplayMode: 'modal',
-    editDisplayMode: 'row',
+    data: fetchedTimesheets,
+    editDisplayMode: 'modal',
     enableColumnPinning: true,
     enableDensityToggle: false,
     enableEditing: true,
+    enableFacetedValues: true,
     enableFullScreenToggle: false,
+    enableGlobalFilter: false,
+    enableGrouping: true,
     enableRowNumbers: true,
     initialState: {
       columnPinning: { left: [], right: ['mrt-row-actions'] }
@@ -178,9 +269,43 @@ export default function Timesheet() {
         }
       : undefined,
     onCreatingRowCancel: () => setValidationErrors({}),
+    onCreatingRowSave: handleCreateTimesheet,
     onEditingRowCancel: () => setValidationErrors({}),
     onEditingRowSave: handleSaveTimesheet,
     positionActionsColumn: 'last',
+    renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
+      <>
+        <DialogTitle variant="h5">Dodaj ewidencje</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <EmployeeSearch onEmployeeSelect={(newValue) => (row.original.employeeId = newValue)} />
+          {internalEditComponents.filter(
+            (component) =>
+              !['id', 'lastName', 'firstName'].includes(
+                component.props.cell.column.columnDef.accessorKey
+              ) && !['month', 'year'].includes(component.props.cell.column.columnDef.id)
+          )}
+        </DialogContent>
+        <DialogActions>
+          <MRT_EditActionButtons variant="text" table={table} row={row} />
+        </DialogActions>
+      </>
+    ),
+    renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
+      <>
+        <DialogTitle variant="h5">Edycja ewidencji</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {internalEditComponents.filter(
+            (component) =>
+              !['id', 'lastName', 'firstName'].includes(
+                component.props.cell.column.columnDef.accessorKey
+              ) && !['month', 'year'].includes(component.props.cell.column.columnDef.id)
+          )}
+        </DialogContent>
+        <DialogActions>
+          <MRT_EditActionButtons variant="text" table={table} row={row} />
+        </DialogActions>
+      </>
+    ),
     renderRowActions: ({ row, table }) => (
       <Box sx={{ display: 'flex', gap: '1rem' }}>
         <Tooltip title="Edit">
@@ -212,14 +337,11 @@ export default function Timesheet() {
         </Box>
       </Box>
     ),
-    renderCreateRowDialogContent: ({ table }) => (
-      <CustomCreateRowDialog table={table} fetchData={fetchTimesheets} />
-    ),
     state: {
       isLoading: isLoadingTimesheets,
       isSaving,
       showAlertBanner: isLoadingTimesheetsError,
-      columnVisibility: { id: false }
+      columnVisibility: { id: false, date: false }
     }
   });
 
@@ -230,12 +352,14 @@ export default function Timesheet() {
   );
 }
 
+// eslint-disable-next-line no-unused-vars
 const validateRequired = (value) => !!value.length;
 
+// eslint-disable-next-line no-unused-vars
 function validateTimesheet(timesheet) {
   return {
-    firstName: !validateRequired(timesheet.firstName) ? 'First Name is Required' : '',
-    lastName: !validateRequired(timesheet.lastName) ? 'Last Name is Required' : ''
+    // firstName: !validateRequired(timesheet.firstName) ? 'First Name is Required' : '',
+    // lastName: !validateRequired(timesheet.lastName) ? 'Last Name is Required' : ''
   };
 }
 
@@ -260,103 +384,6 @@ export const UploadPopUp = () => {
           <FileUpload />
         </DialogContent>
       </Dialog>
-    </>
-  );
-};
-
-const CustomCreateRowDialog = ({ table, fetchData }) => {
-  const [formValues, setFormValues] = useState({});
-  const requestWithNotification = useRequestWithNotification();
-  const [employee, setEmployee] = useState();
-  const [date, setDate] = useState();
-
-  const handleEmployeeSelect = (employee) => {
-    setEmployee(employee);
-  };
-
-  const handleChange = (field) => (event) => {
-    setFormValues({ ...formValues, [field]: event.target.value });
-  };
-
-  const handleSave = async () => {
-    const employeeDto = {
-      id: employee.id
-    };
-
-    const timesheetDto = {
-      date: date,
-      workedWeekends: formValues.workedWeekends,
-      workedHours: formValues.workedHours
-    };
-
-    await requestWithNotification(
-      'post',
-      `/timesheet/create`,
-      {
-        timesheetDto,
-        employeeDto
-      },
-      true
-    );
-    table.setCreatingRow(false);
-    fetchData();
-  };
-
-  return (
-    <>
-      <DialogTitle>Nowy czas pracy</DialogTitle>
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <EmployeeSearch onEmployeeSelect={handleEmployeeSelect} />
-        <DatePicker
-          label="Miesiąc i rok"
-          views={['month', 'year']}
-          onChange={(newValue) => setDate(newValue)}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              fullWidth
-              margin="normal"
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-          )}
-        />
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <TextField
-              label="Godziny"
-              type="number"
-              fullWidth
-              value={formValues.workedHours}
-              onChange={handleChange('workedHours')}
-              margin="normal"
-              InputProps={{
-                inputProps: { min: 0, max: 280 }
-              }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Dni weekendowe"
-              type="number"
-              fullWidth
-              value={formValues.workedWeekends}
-              onChange={handleChange('workedWeekends')}
-              margin="normal"
-              InputProps={{
-                inputProps: { min: 0, max: 10 }
-              }}
-            />
-          </Grid>
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => table.setCreatingRow(false)}>Cancel</Button>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Save
-        </Button>
-      </DialogActions>
     </>
   );
 };
