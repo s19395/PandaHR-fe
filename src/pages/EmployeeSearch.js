@@ -52,7 +52,7 @@ const EmployeeSearch = ({ onEmployeeSelect }) => {
   return (
     <Autocomplete
       id="asynchronous-demo"
-      sx={{ width: 300 }}
+      sx={{ width: 300, mt: 2 }}
       open={open}
       onOpen={() => {
         setOpen(true);
