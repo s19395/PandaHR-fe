@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   MRT_EditActionButtons,
   MaterialReactTable,
@@ -16,10 +16,16 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
+// eslint-disable-next-line no-unused-vars
 import moment from 'moment/moment';
 import { ThemeProvider } from '@mui/material/styles';
 import materialReactTableTheme from './themes/MaterialReactTableTheme';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
+import { DatePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// eslint-disable-next-line no-unused-vars
+import dayjs from 'dayjs';
 
 export default function Employees() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -83,27 +89,31 @@ export default function Employees() {
         }
       },
       {
-        accessorFn: (row) => {
-          if (!row) return ''; // Ensure row is defined
-          return moment().diff(row.dateOfBirth, 'years');
-        },
+        accessorFn: (row) => (row.dateOfBirth ? dayjs().diff(row.dateOfBirth, 'years') : ''),
         header: 'Wiek',
         maxSize: 30
       },
       {
+        accessorFn: (row) =>
+          row.dateOfBirth ? dayjs(row.dateOfBirth).format('DD.MM.YYYY').toString() : '',
+        id: 'dateOfBirth',
         accessorKey: 'dateOfBirth',
         header: 'Data urodzenia',
-        Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD.MM.YYYY')}</span>,
-        muiEditTextFieldProps: {
-          variant: 'standard',
-          type: 'date',
-          error: !!validationErrors?.dateOfBirth,
-          helperText: validationErrors?.dateOfBirth,
-          InputLabelProps: { shrink: true },
-          inputProps: {
-            min: '1900-01-01',
-            max: moment().format('YYYY-MM-DD') //
-          }
+        Edit: ({ column, row }) => {
+          return (
+            <DatePicker
+              label="Data urodzenia"
+              defaultValue={dayjs(row._valuesCache.dateOfBirth)}
+              onChange={(newValue) => (row._valuesCache[column.id] = newValue)}
+              sx={{ mt: 2 }}
+              slotProps={{
+                textField: {
+                  error: !!validationErrors?.dateOfBirth,
+                  helperText: validationErrors?.dateOfBirth
+                }
+              }}
+            />
+          );
         }
       },
       {
@@ -182,8 +192,8 @@ export default function Employees() {
       setValidationErrors(newValidationErrors);
       return;
     }
-    setValidationErrors({});
-    setIsSaving(true);
+    // setValidationErrors({});
+    // setIsSaving(true);
     try {
       await requestWithNotification('put', `/employees`, values, true);
       setFetchedEmployees((prev) =>
@@ -305,9 +315,11 @@ export default function Employees() {
   });
 
   return (
-    <ThemeProvider theme={materialReactTableTheme}>
-      <MaterialReactTable table={table} />
-    </ThemeProvider>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+      <ThemeProvider theme={materialReactTableTheme}>
+        <MaterialReactTable table={table} />
+      </ThemeProvider>
+    </LocalizationProvider>
   );
 }
 
