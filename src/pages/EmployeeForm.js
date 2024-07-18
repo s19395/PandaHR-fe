@@ -77,15 +77,59 @@ const CreateEmployee = ({ open, onClose }) => {
   };
 
   const validateStep = (step) => {
-    let newErrors = {};
-    if (step === 0) {
-      if (!formValues.firstName) newErrors.firstName = 'Imię jest wymagane';
-      if (!formValues.lastName) newErrors.lastName = 'Nazwisko jest wymagane';
-      if (!formValues.dateOfBirth) newErrors.dateOfBirth = 'Data urodzenia jest wymagana';
-      if (!formValues.typeOfContract) newErrors.typeOfContract = 'Rodzaj umowy jest wymagany';
-      // if (!formValues.address) newErrors.address = 'Address is required';
-      // if (!formValues.position) newErrors.position = 'Position is required';
+    function validateStepZero() {
+      if (step === 0) {
+        if (!formValues.firstName) newErrors.firstName = 'Imię jest wymagane';
+        if (!formValues.lastName) newErrors.lastName = 'Nazwisko jest wymagane';
+
+        if (formValues.typeOfContract === 'Umowa Zlecenie') {
+          if (!formValues.dateOfBirth)
+            newErrors.dateOfBirth = `Data urodzenia jest wymagana dla ${formValues.typeOfContract}`;
+          if (!formValues.city)
+            newErrors.city = `Miasto jest wymagane dla ${formValues.typeOfContract}`;
+          if (!formValues.zipcode)
+            newErrors.zipcode = `Kod pocztowy wymagany dla ${formValues.typeOfContract}`;
+          if (!formValues.street)
+            newErrors.street = `Ulica jest wymagana dla ${formValues.typeOfContract}`;
+        }
+      }
     }
+
+    function validateStepOne() {
+      if (step === 1) {
+        if (formValues.typeOfContract === 'Umowa o Pracę') {
+          if (!formValues.position)
+            newErrors.position = `Stanowisko jest wymagane dla ${formValues.typeOfContract}`;
+        }
+
+        if (formValues.typeOfContract === 'Umowa Zlecenie') {
+          if (!formValues.position)
+            newErrors.position = `Stanowisko jest wymagane dla ${formValues.typeOfContract}`;
+          if (formValues.position) {
+            if (!formValues.signedAt)
+              newErrors.signedAt = `Data podpisania umowy jest wymagana dla ${formValues.typeOfContract}`;
+            if (!formValues.validFrom)
+              newErrors.validFrom = `Data od jest wymagana dla ${formValues.typeOfContract}`;
+            if (!formValues.validTo)
+              newErrors.validTo = `Data do jest wymagana dla ${formValues.typeOfContract}`;
+            if (!formValues.hourlyRate)
+              newErrors.hourlyRate = `Stawka godzinowa jest wymagana dla ${formValues.typeOfContract}`;
+            if (formValues.bonusEnabled) {
+              if (!formValues.bonus)
+                newErrors.bonus = `Premia jest wymagana dla w przypadku aktywnego bonusu`;
+              if (!formValues.bonusThreshold)
+                newErrors.bonusThreshold = `Liczba dni weekendowych do premii jest wymagana dla w przypadku aktywnego bonusu`;
+            }
+          }
+        }
+      }
+    }
+
+    let newErrors = {};
+
+    validateStepZero();
+    validateStepOne();
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -93,11 +137,19 @@ const CreateEmployee = ({ open, onClose }) => {
   const handleNext = () => {
     if (validateStep(activeStep)) {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
+
+      if (!formValues.typeOfContract) {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      }
     }
   };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+
+    if (!formValues.typeOfContract) {
+      setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    }
   };
 
   const handleReset = () => {
@@ -267,7 +319,7 @@ const CreateEmployee = ({ open, onClose }) => {
                   </MenuItem>
                 ))}
               </TextField>
-              {(formValues.position || formValues.typeOfContract === 'Pełny etat') && (
+              {(formValues.position || formValues.typeOfContract === 'Umowa o Pracę') && (
                 <>
                   <TextField
                     label="Podpisano w dniu"
@@ -276,6 +328,8 @@ const CreateEmployee = ({ open, onClose }) => {
                     value={formValues.signedAt}
                     onChange={handleChange('signedAt')}
                     margin="normal"
+                    error={!!errors.signedAt}
+                    helperText={errors.signedAt}
                     InputLabelProps={{
                       shrink: true
                     }}
@@ -292,6 +346,8 @@ const CreateEmployee = ({ open, onClose }) => {
                         value={formValues.validFrom}
                         onChange={handleChange('validFrom')}
                         margin="normal"
+                        error={!!errors.validFrom}
+                        helperText={errors.validFrom}
                         InputLabelProps={{
                           shrink: true
                         }}
@@ -308,6 +364,8 @@ const CreateEmployee = ({ open, onClose }) => {
                         value={formValues.validTo}
                         onChange={handleChange('validTo')}
                         margin="normal"
+                        error={!!errors.validTo}
+                        helperText={errors.validTo}
                         InputLabelProps={{
                           shrink: true
                         }}
@@ -324,6 +382,8 @@ const CreateEmployee = ({ open, onClose }) => {
                     value={formValues.hourlyRate}
                     onChange={handleChange('hourlyRate')}
                     margin="normal"
+                    error={!!errors.hourlyRate}
+                    helperText={errors.hourlyRate}
                     InputProps={{
                       endAdornment: <InputAdornment position="end">zł/h</InputAdornment>,
                       inputProps: { min: 0, max: 100 }
@@ -331,13 +391,15 @@ const CreateEmployee = ({ open, onClose }) => {
                   />
                   <FormControlLabel
                     label="Premia"
+                    error={!!errors.bonusEnabled}
+                    helperText={errors.bonusEnabled}
                     control={
                       <Checkbox
                         checked={formValues.bonusEnabled}
                         onChange={handleCheckboxChange('bonusEnabled')}
                       />
                     }
-                  />{' '}
+                  />
                 </>
               )}
               {formValues.bonusEnabled && (
@@ -351,6 +413,8 @@ const CreateEmployee = ({ open, onClose }) => {
                         value={formValues.bonus}
                         onChange={handleChange('bonus')}
                         margin="normal"
+                        error={!!errors.bonus}
+                        helperText={errors.bonus}
                         InputProps={{
                           endAdornment: <InputAdornment position="end">zł/dzień</InputAdornment>,
                           inputProps: { min: 0, max: 1000 }
@@ -365,6 +429,8 @@ const CreateEmployee = ({ open, onClose }) => {
                         value={formValues.bonusThreshold}
                         onChange={handleChange('bonusThreshold')}
                         margin="normal"
+                        error={!!errors.bonusThreshold}
+                        helperText={errors.bonusThreshold}
                         InputProps={{
                           endAdornment: <InputAdornment position="end">dni</InputAdornment>,
                           inputProps: { min: 0, max: 10 }
@@ -389,68 +455,95 @@ const CreateEmployee = ({ open, onClose }) => {
                       <DetailItem title="Nazwisko" content={formValues.lastName} />
                     </Grid>
                     <Grid item xs={12}>
-                      <DetailItem title="Data urodzenia:" content={formValues.dateOfBirth} />
+                      <DetailItem title="Data urodzenia" content={formValues.dateOfBirth} />
                     </Grid>
-                    <Grid item xs={12}>
-                      <DetailItem title="Rodzaj umowy:" content={formValues.typeOfContract} />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <DetailItem
-                        title="Adres:"
-                        content={`
-                          ${formValues.zipcode ? formValues.zipcode + ' ' : ''}
-                          ${formValues.city ? formValues.city + ', ' : ''}
-                          ${formValues.street ? formValues.street : ''}
-                      `}
-                      />
-                    </Grid>
+                    {formValues.signedAt && (
+                      <>
+                        <Grid item xs={12}>
+                          <DetailItem title="Rodzaj umowy" content={formValues.typeOfContract} />
+                        </Grid>
+                      </>
+                    )}
+                    {(formValues.zipcode || formValues.city || formValues.street) && (
+                      <>
+                        <Grid item xs={12}>
+                          <DetailItem
+                            title="Adres"
+                            content={`
+                              ${formValues.zipcode ? formValues.zipcode + ' ' : ''}
+                              ${formValues.city ? formValues.city + ', ' : ''}
+                              ${formValues.street ? formValues.street : ''}
+                            `}
+                          />
+                        </Grid>
+                      </>
+                    )}
                     <Grid item xs={12}>
                       <Divider variant="middle" />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <DetailItem title="Stanowisko:" content={formValues.position} />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <DetailItem
-                        title="Podpisano dnia:"
-                        content={dayjs(formValues.signedAt).format('DD.MM.YYYY')}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <DetailItem
-                        title="Data od:"
-                        content={dayjs(formValues.validFrom).format('DD.MM.YYYY')}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <DetailItem
-                        title="Data do:"
-                        content={dayjs(formValues.validTo).format('DD.MM.YYYY')}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <DetailItem
-                        title="Premia:"
-                        content={formValues.bonusEnabled ? 'Tak' : 'Nie'}
-                      />
-                    </Grid>
-                    {formValues.bonusEnabled && (
+                    {formValues.position && (
                       <>
-                        <Grid item xs={12}>
-                          <Divider variant="middle" />
-                        </Grid>
                         <Grid item xs={12} sm={6}>
-                          <DetailItem title="Stawka godzinowa:" content={formValues.hourlyRate} />
+                          <DetailItem title="Stanowisko" content={formValues.position} />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <DetailItem title="Premia:" content={formValues.bonus} />
-                        </Grid>
+                        {formValues.signedAt && (
+                          <>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem
+                                title="Podpisano dnia"
+                                content={dayjs(formValues.signedAt).format('DD.MM.YYYY')}
+                              />
+                            </Grid>
+                          </>
+                        )}
+                        {formValues.validFrom && (
+                          <>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem
+                                title="Data od"
+                                content={dayjs(formValues.validFrom).format('DD.MM.YYYY')}
+                              />
+                            </Grid>
+                          </>
+                        )}
+                        {formValues.validTo && (
+                          <>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem
+                                title="Data do"
+                                content={dayjs(formValues.validTo).format('DD.MM.YYYY')}
+                              />
+                            </Grid>
+                          </>
+                        )}
                         <Grid item xs={12} sm={6}>
                           <DetailItem
-                            title="Liczba dni weekendowych do premii:"
-                            content={formValues.bonusThreshold}
+                            title="Premia"
+                            content={formValues.bonusEnabled ? 'Tak' : 'Nie'}
                           />
                         </Grid>
+                        {formValues.bonusEnabled && (
+                          <>
+                            <Grid item xs={12}>
+                              <Divider variant="middle" />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem
+                                title="Stawka godzinowa"
+                                content={formValues.hourlyRate}
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem title="Premia" content={formValues.bonus} />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem
+                                title="Liczba dni weekendowych do premii"
+                                content={formValues.bonusThreshold}
+                              />
+                            </Grid>
+                          </>
+                        )}
                       </>
                     )}
                   </Grid>
