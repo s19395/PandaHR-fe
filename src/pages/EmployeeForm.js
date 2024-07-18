@@ -189,7 +189,13 @@ const CreateEmployee = ({ open, onClose }) => {
       positionDto: positionDto,
       signedAt: formValues.signedAt,
       validFrom: formValues.validFrom,
-      validTo: formValues.validTo
+      validTo: formValues.validTo,
+      earningConditionsDto: {
+        hourlyRate: formValues.hourlyRate,
+        bonusEnabled: formValues.bonusEnabled,
+        bonus: formValues.bonus,
+        bonusThreshold: formValues.bonusThreshold
+      }
     };
   }
 
