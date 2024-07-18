@@ -1,43 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import { request } from '../../helper/AxiosHelper';
-import { useAuth } from '../../helper/AuthProvider';
+import React from 'react';
+import { Typography, Grid, Paper, Box, Avatar } from '@mui/material';
+
+import AnnouncementIcon from '@mui/icons-material/Announcement';
 
 const Content = () => {
-  const [data, setData] = useState([]);
-  const { token } = useAuth(); // Get the token from the AuthProvider
-
-  useEffect(() => {
-    request('GET', '/messages', null, token)
-      .then((response) => {
-        console.log(response.data);
-        setData(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
-
   return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-      <Toolbar />
-      <h3>This is a response from the backend</h3>
-      <Typography paragraph>{data}</Typography>
-      <h3>This is not a response from the backend</h3>
-      <Typography paragraph>
-        Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget nulla
-        facilisi etiam dignissim diam. Pulvinar elementum integer enim neque volutpat ac tincidunt.
-        Ornare suspendisse sed nisi lacus sed viverra tellus. Purus sit amet volutpat consequat
-        mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis risus sed vulputate
-        odio. Morbi tincidunt ornare massa eget egestas purus viverra accumsan in. In hendrerit
-        hendrerit gravid rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem et
-        Habitant morbi tristique senectus et. Adipiscing elit duis tristique sollicitudin nibh sit.
-        Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra maecenas accumsan lacus
-        vel facilisis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a.
-      </Typography>
-    </Box>
+    <Paper sx={{ p: 3, bgcolor: '#f5f5f5' }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Avatar sx={{ bgcolor: '#1976d2', width: 60, height: 60, mr: 2 }}>
+              <AnnouncementIcon sx={{ fontSize: 40 }} />
+            </Avatar>
+            <Typography variant="h3" gutterBottom sx={{ mt: 2 }}>
+              PandaHR
+            </Typography>
+          </Box>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2, bgcolor: '#ffffff', height: '100%' }}>
+            <Typography variant="h5" gutterBottom>
+              Pomocne linki
+            </Typography>
+            <Typography variant="body1">Przydatne linki, informacje etc</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2, bgcolor: '#ffffff', height: '100%' }}>
+            <Typography variant="h5" gutterBottom>
+              Powiadomienia
+            </Typography>
+            <Typography variant="body1">
+              Powiadomienia dotyczące pracowników, stanowisk, umów, plików rozliczeniowych i innych.
+            </Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Paper>
   );
 };
 
