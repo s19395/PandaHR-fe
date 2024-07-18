@@ -25,10 +25,27 @@ import moment from 'moment';
 import dayjs from 'dayjs';
 
 const steps = ['Pracownik', 'Dokumenty', 'Przegląd'];
+const initialFormValues = {
+  firstName: '',
+  lastName: '',
+  dateOfBirth: '',
+  typeOfContract: '',
+  street: '',
+  zipcode: '',
+  city: '',
+  position: '',
+  signedAt: '',
+  validFrom: '',
+  validTo: '',
+  hourlyRate: '',
+  bonusEnabled: false,
+  bonus: '',
+  bonusThreshold: ''
+};
 
 const CreateEmployee = ({ open, onClose }) => {
   const [activeStep, setActiveStep] = useState(0);
-  const [formValues, setFormValues] = useState({});
+  const [formValues, setFormValues] = useState(initialFormValues);
   const [errors, setErrors] = useState({});
   const [positions, setPositions] = useState([]);
   const [contracts, setContracts] = useState([]);
@@ -120,13 +137,7 @@ const CreateEmployee = ({ open, onClose }) => {
       positionDto: positionDto,
       signedAt: formValues.signedAt,
       validFrom: formValues.validFrom,
-      validTo: formValues.validTo,
-      earningConditionsDto: {
-        hourlyRate: formValues.hourlyRate,
-        bonusEnabled: formValues.bonusEnabled,
-        bonus: formValues.bonus,
-        bonusThreshold: formValues.bonusThreshold
-      }
+      validTo: formValues.validTo
     };
   }
 
@@ -256,7 +267,7 @@ const CreateEmployee = ({ open, onClose }) => {
                   </MenuItem>
                 ))}
               </TextField>
-              {formValues.position && (
+              {(formValues.position || formValues.typeOfContract === 'Pełny etat') && (
                 <>
                   <TextField
                     label="Podpisano w dniu"
@@ -372,77 +383,56 @@ const CreateEmployee = ({ open, onClose }) => {
                 <Box mt={2}>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        <strong>Imię:</strong>
-                      </Typography>
-                      <Typography variant="body1">{formValues.firstName}</Typography>
+                      <DetailItem title="Imię" content={formValues.firstName} />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        <strong>Nazwisko:</strong>
-                      </Typography>
-                      <Typography variant="body1">{formValues.lastName}</Typography>
+                      <DetailItem title="Nazwisko" content={formValues.lastName} />
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        <strong>Data urodzenia:</strong>
-                      </Typography>
-                      <Typography variant="body1">{formValues.dateOfBirth}</Typography>
+                      <DetailItem title="Data urodzenia:" content={formValues.dateOfBirth} />
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        <strong>Rodzaj umowy:</strong>
-                      </Typography>
-                      <Typography variant="body1">{formValues.typeOfContract}</Typography>
+                      <DetailItem title="Rodzaj umowy:" content={formValues.typeOfContract} />
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        <strong>Adres:</strong>
-                      </Typography>
-                      <Typography variant="body1">
-                        {`${formValues.zipcode ? formValues.zipcode + ' ' : ''}${formValues.city ? formValues.city + ', ' : ''}${formValues.street ? formValues.street : ''}`}
-                      </Typography>
+                      <DetailItem
+                        title="Adres:"
+                        content={`
+                          ${formValues.zipcode ? formValues.zipcode + ' ' : ''}
+                          ${formValues.city ? formValues.city + ', ' : ''}
+                          ${formValues.street ? formValues.street : ''}
+                      `}
+                      />
                     </Grid>
                     <Grid item xs={12}>
                       <Divider variant="middle" />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        <strong>Stanowisko:</strong>
-                      </Typography>
-                      <Typography variant="body1">{formValues.position}</Typography>
+                      <DetailItem title="Stanowisko:" content={formValues.position} />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        <strong>Podpisano dnia:</strong>
-                      </Typography>
-                      <Typography variant="body1">
-                        {dayjs(formValues.signedAt).format('DD.MM.YYYY')}
-                      </Typography>
+                      <DetailItem
+                        title="Podpisano dnia:"
+                        content={dayjs(formValues.signedAt).format('DD.MM.YYYY')}
+                      />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        <strong>Data od:</strong>
-                      </Typography>
-                      <Typography variant="body1">
-                        {dayjs(formValues.validFrom).format('DD.MM.YYYY')}
-                      </Typography>
+                      <DetailItem
+                        title="Data od:"
+                        content={dayjs(formValues.validFrom).format('DD.MM.YYYY')}
+                      />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        <strong>Data do:</strong>
-                      </Typography>
-                      <Typography variant="body1">
-                        {dayjs(formValues.validTo).format('DD.MM.YYYY')}
-                      </Typography>
+                      <DetailItem
+                        title="Data do:"
+                        content={dayjs(formValues.validTo).format('DD.MM.YYYY')}
+                      />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        <strong>Premia:</strong>
-                      </Typography>
-                      <Typography variant="body1">
-                        {formValues.bonusEnabled ? 'Tak' : 'Nie'}
-                      </Typography>
+                      <DetailItem
+                        title="Premia:"
+                        content={formValues.bonusEnabled ? 'Tak' : 'Nie'}
+                      />
                     </Grid>
                     {formValues.bonusEnabled && (
                       <>
@@ -450,22 +440,16 @@ const CreateEmployee = ({ open, onClose }) => {
                           <Divider variant="middle" />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <Typography variant="subtitle1" color="textSecondary">
-                            <strong>Stawka godzinowa:</strong>
-                          </Typography>
-                          <Typography variant="body1">{formValues.hourlyRate}</Typography>
+                          <DetailItem title="Stawka godzinowa:" content={formValues.hourlyRate} />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <Typography variant="subtitle1" color="textSecondary">
-                            <strong>Premia:</strong>
-                          </Typography>
-                          <Typography variant="body1">{formValues.bonus}</Typography>
+                          <DetailItem title="Premia:" content={formValues.bonus} />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <Typography variant="subtitle1" color="textSecondary">
-                            <strong>Liczba dni weekendowych do premii</strong>
-                          </Typography>
-                          <Typography variant="body1">{formValues.bonusThreshold}</Typography>
+                          <DetailItem
+                            title="Liczba dni weekendowych do premii:"
+                            content={formValues.bonusThreshold}
+                          />
                         </Grid>
                       </>
                     )}
@@ -490,6 +474,17 @@ const CreateEmployee = ({ open, onClose }) => {
         <Button onClick={handleReset}>Cancel</Button>
       </DialogActions>
     </Dialog>
+  );
+};
+
+export const DetailItem = ({ title, content }) => {
+  return (
+    <>
+      <Typography variant="subtitle1" color="textSecondary">
+        <strong>{title}:</strong>
+      </Typography>
+      <Typography variant="body1">{content}</Typography>
+    </>
   );
 };
 
