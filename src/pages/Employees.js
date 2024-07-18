@@ -57,22 +57,7 @@ export default function Employees() {
     () => [
       {
         accessorKey: 'id',
-        header: '',
         editable: false
-      },
-      {
-        accessorKey: 'firstName',
-        header: 'First Name',
-        muiEditTextFieldProps: {
-          required: true,
-          error: !!validationErrors?.firstName,
-          helperText: validationErrors?.firstName,
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              firstName: undefined
-            })
-        }
       },
       {
         accessorKey: 'lastName',
@@ -89,16 +74,36 @@ export default function Employees() {
         }
       },
       {
+        accessorKey: 'firstName',
+        header: 'First Name',
+        muiEditTextFieldProps: {
+          required: true,
+          error: !!validationErrors?.firstName,
+          helperText: validationErrors?.firstName,
+          onFocus: () =>
+            setValidationErrors({
+              ...validationErrors,
+              firstName: undefined
+            })
+        }
+      },
+      {
         accessorFn: (row) => (row.dateOfBirth ? dayjs().diff(row.dateOfBirth, 'years') : ''),
+        id: 'age',
         header: 'Wiek',
         maxSize: 30
       },
       {
-        accessorFn: (row) =>
-          row.dateOfBirth ? dayjs(row.dateOfBirth).format('DD.MM.YYYY').toString() : '',
-        id: 'dateOfBirth',
         accessorKey: 'dateOfBirth',
+        id: 'dateOfBirth',
         header: 'Data urodzenia',
+        Cell: ({ row }) => (
+          <span>
+            {row.original.dateOfBirth
+              ? dayjs(row.original.dateOfBirth).format('DD.MM.YYYY').toString()
+              : ''}
+          </span>
+        ),
         Edit: ({ column, row }) => {
           return (
             <DatePicker
@@ -138,6 +143,7 @@ export default function Employees() {
           ];
           return parts.filter(Boolean).join('');
         },
+        id: 'adress',
         header: 'Adres zamieszkania'
       },
       {
@@ -186,14 +192,18 @@ export default function Employees() {
     setIsSaving(false);
   };
 
-  const handleSaveEmployee = async ({ values, table }) => {
+  const handleSaveEmployee = async ({ row, values, table }) => {
     const newValidationErrors = validateEmployee(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
       return;
     }
-    // setValidationErrors({});
-    // setIsSaving(true);
+    setValidationErrors({});
+    setIsSaving(true);
+    values = {
+      ...values,
+      id: row.original.id
+    };
     try {
       await requestWithNotification('put', `/employees`, values, true);
       setFetchedEmployees((prev) =>
@@ -274,8 +284,10 @@ export default function Employees() {
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {internalEditComponents.filter(
             (component) =>
-              !['age'].includes(component.props.cell.column.columnDef.accessorKey) &&
-              !['Wiek', 'Adres zamieszkania'].includes(component.props.cell.column.columnDef.header)
+              !['id'].includes(component.props.cell.column.columnDef.accessorKey) &&
+              !['age', 'adress', 'dateOfBirthDisplay'].includes(
+                component.props.cell.column.columnDef.id
+              )
           )}
         </DialogContent>
         <DialogActions>
@@ -310,7 +322,14 @@ export default function Employees() {
       isLoading: isLoadingEmployees,
       isSaving,
       showAlertBanner: isLoadingEmployeesError,
-      columnVisibility: { id: false, street: false, city: false, zipCode: false, country: false }
+      columnVisibility: {
+        id: false,
+        street: false,
+        city: false,
+        zipCode: false,
+        country: false
+        // dateOfBirth: false
+      }
     }
   });
 
@@ -323,34 +342,24 @@ export default function Employees() {
   );
 }
 
-const validateRequired = (value) => !!value.length;
-
 function validateEmployee(employee) {
   let dateOfBirth = '';
   let city = '';
   let zipCode = '';
   let street = '';
 
-  console.log(employee);
-
   if (employee.employmentContract === 'Umowa Zlecenie') {
-    dateOfBirth = !validateRequired(employee.dateOfBirth)
+    dateOfBirth = !employee.dateOfBirth
       ? `Data urodzenia jest wymagana dla ${employee.employmentContract}`
       : '';
-    city = !validateRequired(employee.city)
-      ? `Miasto jest wymagane dla ${employee.employmentContract}`
-      : '';
-    zipCode = !validateRequired(employee.zipCode)
-      ? `Kod pocztowy wymagany dla ${employee.employmentContract}`
-      : '';
-    street = !validateRequired(employee.street)
-      ? `Ulica jest wymagana dla ${employee.employmentContract}`
-      : '';
+    city = !employee.city ? `Miasto jest wymagane dla ${employee.employmentContract}` : '';
+    zipCode = !employee.zipCode ? `Kod pocztowy wymagany dla ${employee.employmentContract}` : '';
+    street = !employee.street ? `Ulica jest wymagana dla ${employee.employmentContract}` : '';
   }
 
   return {
-    firstName: !validateRequired(employee.firstName) ? 'Imię jest wymagane' : '',
-    lastName: !validateRequired(employee.lastName) ? 'Nazwisko jest wymagane' : '',
+    firstName: !employee.firstName ? 'Imię jest wymagane' : '',
+    lastName: !employee.lastName ? 'Nazwisko jest wymagane' : '',
     dateOfBirth,
     city,
     zipCode,

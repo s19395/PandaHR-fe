@@ -97,11 +97,6 @@ const CreateEmployee = ({ open, onClose }) => {
 
     function validateStepOne() {
       if (step === 1) {
-        if (formValues.typeOfContract === 'Umowa o Pracę') {
-          if (!formValues.position)
-            newErrors.position = `Stanowisko jest wymagane dla ${formValues.typeOfContract}`;
-        }
-
         if (formValues.typeOfContract === 'Umowa Zlecenie') {
           if (!formValues.position)
             newErrors.position = `Stanowisko jest wymagane dla ${formValues.typeOfContract}`;
@@ -257,7 +252,6 @@ const CreateEmployee = ({ open, onClose }) => {
                 label="Rodzaj umowy"
                 fullWidth
                 select
-                value={formValues.typeOfContract}
                 onChange={handleChange('typeOfContract')}
                 margin="normal"
                 error={!!errors.typeOfContract}
@@ -325,7 +319,7 @@ const CreateEmployee = ({ open, onClose }) => {
                   </MenuItem>
                 ))}
               </TextField>
-              {(formValues.position || formValues.typeOfContract === 'Umowa o Pracę') && (
+              {(formValues.position || formValues.typeOfContract === 'Umowa Zlecenie') && (
                 <>
                   <TextField
                     label="Podpisano w dniu"
@@ -397,8 +391,6 @@ const CreateEmployee = ({ open, onClose }) => {
                   />
                   <FormControlLabel
                     label="Premia"
-                    error={!!errors.bonusEnabled}
-                    helperText={errors.bonusEnabled}
                     control={
                       <Checkbox
                         checked={formValues.bonusEnabled}
@@ -460,10 +452,17 @@ const CreateEmployee = ({ open, onClose }) => {
                     <Grid item xs={12} sm={6}>
                       <DetailItem title="Nazwisko" content={formValues.lastName} />
                     </Grid>
-                    <Grid item xs={12}>
-                      <DetailItem title="Data urodzenia" content={formValues.dateOfBirth} />
-                    </Grid>
-                    {formValues.signedAt && (
+                    {formValues.dateOfBirth && (
+                      <>
+                        <Grid item xs={12}>
+                          <DetailItem
+                            title="Data urodzenia"
+                            content={dayjs(formValues.dateOfBirth).format('DD.MM.YYYY')}
+                          />
+                        </Grid>
+                      </>
+                    )}
+                    {formValues.typeOfContract && (
                       <>
                         <Grid item xs={12}>
                           <DetailItem title="Rodzaj umowy" content={formValues.typeOfContract} />
