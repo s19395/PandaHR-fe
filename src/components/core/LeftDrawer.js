@@ -14,6 +14,7 @@ import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import CreateEmployee from '../../pages/EmployeeForm';
 import PeopleIcon from '@mui/icons-material/People';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 
 const drawerWidth = 240;
 
@@ -22,7 +23,8 @@ const items = [
   { text: 'Pracownicy', icon: <PeopleIcon />, link: '/employees' },
   { text: 'Wymiar czasu pracy', icon: <ScheduleIcon />, link: '/timesheet' },
   { text: 'Stanowiska', icon: <WorkIcon />, link: '/positions' },
-  { text: 'Umowy', icon: <DescriptionIcon />, link: '/contracts' }
+  { text: 'Umowy', icon: <DescriptionIcon />, link: '/contracts' },
+  { text: 'Rozliczenia', icon: <CurrencyExchangeIcon />, link: '/payroll' }
 ];
 
 export default function LeftDrawer() {
