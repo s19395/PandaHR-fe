@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { useAlert } from './AlertProvider';
-import { useNavigate } from 'react-router-dom';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.baseURL = process.env.REACT_APP_ENDPOINT;
