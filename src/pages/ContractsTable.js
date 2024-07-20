@@ -159,7 +159,7 @@ const ContractsData = ({ employee }) => {
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       const contentDisposition = response.headers['content-disposition'];
-      const fileName = contentDisposition.split('filename=')[1].split(';')[0];
+      const fileName = contentDisposition.split('filename=')[1].split(';')[0].replace(/"/g, '');;
       link.download = fileName;
       link.click();
     } catch (error) {
