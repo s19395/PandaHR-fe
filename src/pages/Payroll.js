@@ -11,6 +11,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import * as React from 'react';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
+import Button from '@mui/material/Button';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+// eslint-disable-next-line no-unused-vars
+import axios from 'axios';
 
 const Payroll = () => {
   const [filterDate, setFilterDate] = useState(dayjs());
@@ -365,13 +369,32 @@ const Payroll = () => {
       </Box>
     ),
     renderTopToolbarCustomActions: () => (
-      <DatePicker
-        label="Data rozliczenia"
-        views={['month', 'year']}
-        defaultValue={filterDate}
-        onChange={(newValue) => setFilterDate(newValue)}
-        sx={{ m: 2 }}
-      />
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center'
+        }}>
+        <DatePicker
+          label="Data rozliczenia"
+          views={['month', 'year']}
+          defaultValue={filterDate}
+          onChange={(newValue) => setFilterDate(newValue)}
+          sx={{ m: 2 }}
+        />
+        <Button
+          onClick={() => handleExportData('settlements', filterDate)}
+          startIcon={<FileDownloadIcon />}
+          sx={{ ml: 2 }}>
+          Plik rozliczeniowy
+        </Button>
+        <Button
+          onClick={() => handleExportData('accounting', filterDate)}
+          startIcon={<FileDownloadIcon />}
+          sx={{ ml: 2 }}>
+          Plik dla księgowości
+        </Button>
+      </Box>
     ),
     state: {
       isLoading: isLoadingPayroll,
@@ -388,5 +411,35 @@ const Payroll = () => {
     </LocalizationProvider>
   );
 };
+
+async function handleExportData(type, filterDate) {
+  try {
+    console.log('Clicked', type);
+    const normalizedDate = filterDate.format('YYYY-MM-DD');
+    const response = await axios.get(
+      `/payroll/export?date=${encodeURIComponent(normalizedDate)}&type=${type}`,
+      {
+        responseType: 'blob'
+      }
+    );
+    if (response.data) {
+      const blob = new Blob([response.data], { type: 'application/octet-stream' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      const contentDisposition = response.headers['content-disposition'];
+      if (contentDisposition) {
+        const fileName = contentDisposition.split('filename=')[1].split(';')[0].replace(/"/g, '');
+        console.log(fileName);
+        link.download = fileName.trim();
+        link.click();
+      } else {
+        console.error('Content-Disposition header is missing');
+      }
+    }
+  } catch (error) {
+    console.error('Error generating document:', error);
+    alert(`Error: ${error.message}`);
+  }
+}
 
 export default Payroll;
