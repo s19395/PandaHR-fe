@@ -25,13 +25,20 @@ export const useRequestWithNotification = () => {
 
       return response.data.data;
     } catch (error) {
-      console.error(error);
-
-      setAlert({
-        open: true,
-        severity: 'error',
-        message: 'HTTP ' + error.response.status + ': ' + error.response.data.message
-      });
+      if (error.response.data.trace.includes('com.auth0.jwt.exceptions.TokenExpiredException')) {
+        setAlert({
+          open: true,
+          severity: 'error',
+          message: 'Sesja wygasła. Zaloguj się ponownie.'
+        });
+        window.localStorage.removeItem('token');
+      } else {
+        setAlert({
+          open: true,
+          severity: 'error',
+          message: 'HTTP ' + error.response.status + ': ' + error.response.data.message
+        });
+      }
 
       throw error;
     }

@@ -404,7 +404,7 @@ const ContractsData = ({ employee }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-      <MaterialReactTable table={table} />;
+      <MaterialReactTable table={table} />
     </LocalizationProvider>
   );
 };
