@@ -20,26 +20,26 @@ import materialReactTableTheme from './themes/MaterialReactTableTheme';
 import { ThemeProvider } from '@mui/material/styles';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment';
-import Duties from './Duties';
+import PositionDuty from './PositionDuty';
 import List from '@mui/material/List';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 
-export default function Positions() {
+export default function Position() {
   const [validationErrors, setValidationErrors] = useState({});
   const [fetchedPositions, setFetchedPositions] = useState([]);
   const [isLoadingPositions, setIsLoadingPositions] = useState(true);
   const [isLoadingPositionsError, setIsLoadingPositionsError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [duties, setDuties] = useState([]);
+  const [dutyList, setDutyList] = useState([]);
   const [newDuty, setNewDuty] = useState('');
 
   const requestWithNotification = useRequestWithNotification();
-  const statuses = ['ACTIVE', 'INACTIVE'];
+  const positionStatus = ['Aktywne', 'Nieaktywne'];
 
   const fetchPositions = async () => {
     try {
       setIsLoadingPositions(true);
-      const data = await requestWithNotification('get', '/positions/findAll');
+      const data = await requestWithNotification('get', '/positions');
       setFetchedPositions(data);
       setIsLoadingPositions(false);
     } catch (error) {
@@ -54,15 +54,15 @@ export default function Positions() {
 
   const columns = useMemo(
     () => [
-      { accessorKey: 'pid', header: 'ID', enableEditing: false },
+      { accessorKey: 'positionId', header: 'ID', enableEditing: false },
       {
-        accessorKey: 'title',
+        accessorKey: 'name',
         header: 'Stanowisko',
         muiEditTextFieldProps: {
           required: true,
-          error: !!validationErrors?.title,
-          helperText: validationErrors?.title,
-          onFocus: () => setValidationErrors({ ...validationErrors, title: undefined })
+          error: !!validationErrors?.name,
+          helperText: validationErrors?.name,
+          onFocus: () => setValidationErrors({ ...validationErrors, name: undefined })
         }
       },
       {
@@ -75,7 +75,7 @@ export default function Positions() {
         accessorKey: 'status',
         header: 'Status',
         editVariant: 'select',
-        editSelectOptions: statuses,
+        editSelectOptions: positionStatus,
         muiEditTextFieldProps: {
           select: true,
           error: !!validationErrors?.status,
@@ -83,8 +83,8 @@ export default function Positions() {
         }
       },
       {
-        accessorFn: (row) => row.duties.map((duty) => duty.description).join(', '),
-        id: 'duties',
+        accessorFn: (row) => row.dutyList.map((duty) => duty.description).join(', '),
+        id: 'dutyList',
         header: '',
         enableEditing: false
       }
@@ -95,19 +95,11 @@ export default function Positions() {
   const validateRequired = (value) => !!value.length;
 
   const validatePosition = (position) => ({
-    title: !validateRequired(position.title) ? 'Stanowisko jest wymagane' : ''
+    name: !validateRequired(position.name) ? 'Stanowisko jest wymagane' : '',
+    status: !validateRequired(position.status) ? 'Status jest wymagany' : ''
   });
 
-  function transformValuesToPandaContractDto(values) {
-    return {
-      posId: values.pid,
-      title: values.title,
-      status: values.status,
-      dutyList: duties
-    };
-  }
-
-  const handleSavePosition = async ({ values, table, isNew = false }) => {
+  const handleSavePosition = async ({ row, values, table, isNew = false }) => {
     const newValidationErrors = validatePosition(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
@@ -116,20 +108,27 @@ export default function Positions() {
     setValidationErrors({});
     setIsSaving(true);
     try {
-      values = transformValuesToPandaContractDto(values);
+      const positionDto = {
+        positionId: row.original.positionId,
+        name: values.name,
+        status: values.status,
+        dutyList: dutyList
+      };
+
       const method = isNew ? 'post' : 'put';
       const url = isNew ? '/positions' : `/positions`;
-      const newPosition = await requestWithNotification(method, url, { ...values }, true);
+      const newPosition = await requestWithNotification(method, url, { ...positionDto }, true);
       if (isNew) {
         setFetchedPositions((prev) => [...prev, newPosition]);
         table.setCreatingRow(null);
       } else {
         setFetchedPositions((prev) =>
-          prev.map((position) => (position.pid === values.pid ? values : position))
+          prev.map((position) =>
+            position.positionId === positionDto.positionId ? positionDto : position
+          )
         );
         table.setEditingRow(null);
       }
-      fetchPositions();
     } catch (error) {
       /* empty */
     }
@@ -152,13 +151,15 @@ export default function Positions() {
     enableStickyFooter: true,
     enableStickyHeader: true,
     initialState: {
-      columnPinning: { left: [], right: ['mrt-row-actions'] }
+      columnPinning: { left: [], right: ['mrt-row-actions'] },
+      columnVisibility: { dutyList: false, positionId: false },
+      expanded: true
     },
     localization: MRT_Localization_PL,
     muiExpandButtonProps: ({ row }) => ({
       sx: {
         display:
-          Array.isArray(row.original.duties) && row.original.duties.length > 0 ? 'flex' : 'none'
+          Array.isArray(row.original.dutyList) && row.original.dutyList.length > 0 ? 'flex' : 'none'
       }
     }),
     muiTableContainerProps: { sx: { minHeight: '500px' } },
@@ -170,26 +171,38 @@ export default function Positions() {
     onEditingRowCancel: () => setValidationErrors({}),
     onEditingRowSave: handleSavePosition,
     positionActionsColumn: 'last',
-    renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
-      <>
-        <DialogTitle variant="h5">Nowe stanowisko</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {internalEditComponents.filter(
-            (component) =>
-              !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey) &&
-              !['duties'].includes(component.props.cell.column.columnDef.id)
-          )}
-          <Duties duties={duties} setDuties={setDuties} newDuty={newDuty} setNewDuty={setNewDuty} />
-        </DialogContent>
-        <DialogActions>
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
-        </DialogActions>
-      </>
-    ),
+    renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => {
+      useEffect(() => {
+        setDutyList([]);
+      }, []);
+
+      return (
+        <>
+          <DialogTitle variant="h5">Nowe stanowisko</DialogTitle>
+          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {internalEditComponents.filter(
+              (component) =>
+                !['positionId', 'createdAt'].includes(
+                  component.props.cell.column.columnDef.accessorKey
+                ) && !['dutyList'].includes(component.props.cell.column.columnDef.id)
+            )}
+            <PositionDuty
+              dutyList={dutyList}
+              setDutyList={setDutyList}
+              newDuty={newDuty}
+              setNewDuty={setNewDuty}
+            />
+          </DialogContent>
+          <DialogActions>
+            <MRT_EditActionButtons variant="text" table={table} row={row} />
+          </DialogActions>
+        </>
+      );
+    },
     renderDetailPanel: ({ row }) => (
       <List sx={{ listStyleType: 'disc' }}>
-        {Array.isArray(row.original.duties) && row.original.duties.length > 0 ? (
-          row.original.duties.map((duty, index) => (
+        {Array.isArray(row.original.dutyList) && row.original.dutyList.length > 0 ? (
+          row.original.dutyList.map((duty, index) => (
             <Box key={index}>
               <ListItem sx={{ display: 'list-item' }}>
                 <ListItemText primary={duty.description} />
@@ -198,14 +211,14 @@ export default function Positions() {
           ))
         ) : (
           <ListItem>
-            <ListItemText primary="No duties available" />
+            <ListItemText primary="No dutyList available" />
           </ListItem>
         )}
       </List>
     ),
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => {
       useEffect(() => {
-        if (row?.original?.duties) setDuties(row.original.duties);
+        if (row?.original?.dutyList) setDutyList(row.original.dutyList);
       }, [row]);
       return (
         <>
@@ -213,12 +226,13 @@ export default function Positions() {
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {internalEditComponents.filter(
               (component) =>
-                !['pid', 'createdAt'].includes(component.props.cell.column.columnDef.accessorKey) &&
-                !['duties'].includes(component.props.cell.column.columnDef.id)
+                !['positionId', 'createdAt'].includes(
+                  component.props.cell.column.columnDef.accessorKey
+                ) && !['dutyList'].includes(component.props.cell.column.columnDef.id)
             )}
-            <Duties
-              duties={duties}
-              setDuties={setDuties}
+            <PositionDuty
+              dutyList={dutyList}
+              setDutyList={setDutyList}
               newDuty={newDuty}
               setNewDuty={setNewDuty}
             />
@@ -231,7 +245,7 @@ export default function Positions() {
     },
     renderRowActions: ({ row, table }) => (
       <Box sx={{ display: 'flex', gap: '1rem' }}>
-        <Tooltip title="Edit">
+        <Tooltip name="Edit">
           <IconButton onClick={() => table.setEditingRow(row)}>
             <EditIcon />
           </IconButton>
@@ -246,8 +260,7 @@ export default function Positions() {
     state: {
       isLoading: isLoadingPositions,
       isSaving,
-      showAlertBanner: isLoadingPositionsError,
-      columnVisibility: { duties: false }
+      showAlertBanner: isLoadingPositionsError
     }
   });
 

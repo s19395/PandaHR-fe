@@ -8,7 +8,7 @@ import Content from '../components/core/Content';
 import Employees from '../pages/Employees';
 import * as React from 'react';
 import ErrorPage from '../components/core/ErrorPage';
-import Positions from '../pages/Positions';
+import Position from '../pages/Position';
 import Contract from '../pages/Contracts';
 import Timesheet from '../pages/Timesheets';
 import Payroll from '../pages/Payroll';
@@ -40,7 +40,7 @@ const Routes = () => {
         },
         {
           path: '/positions',
-          element: <Positions />
+          element: <Position />
         },
         {
           path: '/contracts',
