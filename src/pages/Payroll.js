@@ -9,67 +9,93 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import * as React from 'react';
-// eslint-disable-next-line no-unused-vars
-import { payroll } from './makeData';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 
 const Payroll = () => {
   const [filterDate, setFilterDate] = useState(dayjs());
   const [payroll, setPayroll] = useState([]);
-  // eslint-disable-next-line no-unused-vars
-  const [positions, setPositions] = useState([]);
-  // eslint-disable-next-line no-unused-vars
-  const [contracts, setContracts] = useState([]);
-  // eslint-disable-next-line no-unused-vars
   const [creatingRowIndex, setCreatingRowIndex] = useState();
-  // eslint-disable-next-line no-unused-vars
-  const [validationErrors, setValidationErrors] = useState({});
-  // eslint-disable-next-line no-unused-vars
   const [isLoadingPayroll, setIsLoadingPayroll] = useState(true);
-  // eslint-disable-next-line no-unused-vars
   const [isLoadingPayrollError, setIsLoadingPayrollError] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [isSaving, setIsSaving] = useState(false);
 
-  // eslint-disable-next-line no-unused-vars
   const requestWithNotification = useRequestWithNotification();
 
+  const fetchPayroll = async () => {
+    try {
+      const normalizedDate = filterDate.format('YYYY-MM-DD');
+      const payroll = await requestWithNotification(
+        'get',
+        `/payroll?date=${encodeURIComponent(normalizedDate)}`
+      );
+      console.log(payroll);
+      setPayroll(payroll);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setIsLoadingPayrollError(true);
+    } finally {
+      setIsLoadingPayroll(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchPayroll = async () => {
-      try {
-        const normalizedDate = filterDate.format('YYYY-MM-DD');
-        const payroll = await requestWithNotification(
-          'get',
-          `/payroll?date=${encodeURIComponent(normalizedDate)}`
-        );
-        console.log(payroll);
-        setPayroll(payroll);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setIsLoadingPayrollError(true);
-      } finally {
-        setIsLoadingPayroll(false);
-      }
-    };
     fetchPayroll();
   }, [filterDate]);
 
-  // eslint-disable-next-line no-unused-vars
-  const handleCreateContract = async ({ values, row, table }) => {};
+  const handleCreateBonus = async ({ values, row, table }) => {
+    setIsSaving(true);
+    try {
+      await requestWithNotification('post', '/payroll/bonus', {
+        employeeId: row.original.id,
+        date: filterDate,
+        comment: values.comment,
+        bonus: values.bonus
+      });
 
-  // eslint-disable-next-line no-unused-vars
-  const handleSaveContract = async ({ values, table, row }) => {};
+      table.setCreatingRow(null);
+    } catch (error) {
+      console.error('Error creating bonus:', error);
+    } finally {
+      setIsSaving(false);
+      fetchPayroll();
+    }
+  };
 
-  // eslint-disable-next-line no-unused-vars
-  const handleDeleteContract = async (contractId) => {};
+  const handleSaveBonus = async ({ values, table, row }) => {
+    setIsSaving(true);
+    try {
+      await requestWithNotification('put', `/payroll/bonus`, {
+        comment: values.comment,
+        bonus: values.bonus,
+        id: row.original.id
+      });
+
+      table.setEditingRow(null);
+    } catch (error) {
+      console.error('Error saving bonus:', error);
+    } finally {
+      setIsSaving(false);
+      fetchPayroll();
+    }
+  };
+
+  const handleDeleteBonus = async (bonusId) => {
+    setIsSaving(true);
+    try {
+      await requestWithNotification('delete', `/payroll/bonus/${bonusId}`);
+    } catch (error) {
+      console.error('Error deleting bonus:', error);
+    }
+    setIsSaving(false);
+    fetchPayroll();
+  };
 
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'id',
-        header: 'Id',
-        enableEditing: false
+        accessorKey: 'employeeId',
+        header: 'Id pracownika'
       },
       {
         accessorKey: 'lastName',
@@ -95,7 +121,7 @@ const Payroll = () => {
             {cell.getValue()?.toLocaleString?.('pl-PL', {
               style: 'currency',
               currency: 'PLN',
-              minimumFractionDigits: 0,
+              minimumFractionDigits: 2,
               maximumFractionDigits: 2
             })}
           </>
@@ -107,10 +133,12 @@ const Payroll = () => {
         enableEditing: false,
         Cell: ({ cell }) => (
           <>
-            {cell.getValue()?.toLocaleString?.({
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 2
-            }) + ' h'}
+            {cell.getValue()
+              ? `${cell.getValue().toLocaleString({
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2
+                })} h`
+              : ''}
           </>
         )
       },
@@ -124,7 +152,7 @@ const Payroll = () => {
               {cell.getValue()?.toLocaleString?.('pl-PL', {
                 style: 'currency',
                 currency: 'PLN',
-                minimumFractionDigits: 0,
+                minimumFractionDigits: 2,
                 maximumFractionDigits: 2
               })}
             </Box>
@@ -137,10 +165,12 @@ const Payroll = () => {
         enableEditing: false,
         Cell: ({ cell }) => (
           <>
-            {cell.getValue()?.toLocaleString?.({
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 0
-            }) + ' dni'}
+            {cell.getValue()
+              ? `${cell.getValue().toLocaleString({
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                })} dni`
+              : ''}
           </>
         )
       },
@@ -153,7 +183,7 @@ const Payroll = () => {
             {cell.getValue()?.toLocaleString?.('pl-PL', {
               style: 'currency',
               currency: 'PLN',
-              minimumFractionDigits: 0,
+              minimumFractionDigits: 2,
               maximumFractionDigits: 2
             })}
           </>
@@ -169,7 +199,7 @@ const Payroll = () => {
               {cell.getValue()?.toLocaleString?.('pl-PL', {
                 style: 'currency',
                 currency: 'PLN',
-                minimumFractionDigits: 0,
+                minimumFractionDigits: 2,
                 maximumFractionDigits: 2
               })}
             </Box>
@@ -184,14 +214,14 @@ const Payroll = () => {
             {cell.getValue()?.toLocaleString?.('pl-PL', {
               style: 'currency',
               currency: 'PLN',
-              minimumFractionDigits: 0,
+              minimumFractionDigits: 2,
               maximumFractionDigits: 2
             })}
           </>
         )
       },
       {
-        accessorKey: 'bonusWeekendAndPay',
+        accessorKey: 'bonusTotal',
         header: 'Premia razem',
         enableEditing: false,
         Cell: ({ cell }) => (
@@ -200,7 +230,7 @@ const Payroll = () => {
               {cell.getValue()?.toLocaleString?.('pl-PL', {
                 style: 'currency',
                 currency: 'PLN',
-                minimumFractionDigits: 0,
+                minimumFractionDigits: 2,
                 maximumFractionDigits: 2
               })}
             </Box>
@@ -209,7 +239,19 @@ const Payroll = () => {
       },
       {
         accessorKey: 'comment',
-        header: 'Komentarz'
+        header: 'Komentarz',
+        Cell: ({ cell }) => (
+          <>
+            <Tooltip
+              title={
+                <div style={{ whiteSpace: 'pre-line' }}>
+                  {cell.getValue()?.split(';').join('\n')}
+                </div>
+              }>
+              <span>{cell.getValue()}</span>
+            </Tooltip>
+          </>
+        )
       },
       {
         accessorKey: 'totalPay',
@@ -221,7 +263,7 @@ const Payroll = () => {
               {cell.getValue()?.toLocaleString?.('pl-PL', {
                 style: 'currency',
                 currency: 'PLN',
-                minimumFractionDigits: 0,
+                minimumFractionDigits: 2,
                 maximumFractionDigits: 2
               })}
             </Box>
@@ -237,7 +279,7 @@ const Payroll = () => {
     createDisplayMode: 'row',
     data: payroll,
     defaultColumn: {
-      minSize: 50,
+      minSize: 100,
       maxSize: 400,
       size: 150
     },
@@ -280,10 +322,8 @@ const Payroll = () => {
           children: 'Error loading data'
         }
       : undefined,
-    onCreatingRowCancel: () => setValidationErrors({}),
-    onCreatingRowSave: handleCreateContract,
-    onEditingRowCancel: () => setValidationErrors({}),
-    onEditingRowSave: handleSaveContract,
+    onCreatingRowSave: handleCreateBonus,
+    onEditingRowSave: handleSaveBonus,
     positionCreatingRow: creatingRowIndex,
     renderRowActions: ({ row, staticRowIndex, table }) => (
       <Box sx={{ display: 'flex' }}>
@@ -295,7 +335,7 @@ const Payroll = () => {
               </IconButton>
             </Tooltip>
             <Tooltip title="Usuń">
-              <IconButton color="error" onClick={() => handleDeleteContract(row.original.id)}>
+              <IconButton color="error" onClick={() => handleDeleteBonus(row.original.id)}>
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
@@ -310,14 +350,12 @@ const Payroll = () => {
                   table.setCreatingRow(
                     createRow(
                       table,
-                      {
-                        contractId: row.original.id,
-                        subRows: []
-                      },
+                      { id: row.original.employeeId, subRows: [] },
                       -1,
                       row.depth + 1
                     )
                   );
+                  console.log('Creating row for employee:', row.original.employeeId);
                 }}>
                 <PersonAddAltIcon />
               </IconButton>
@@ -339,7 +377,7 @@ const Payroll = () => {
       isLoading: isLoadingPayroll,
       isSaving,
       showAlertBanner: isLoadingPayrollError,
-      columnVisibility: { id: false },
+      columnVisibility: { employeeId: false },
       density: 'compact'
     }
   });
