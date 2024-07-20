@@ -1,7 +1,9 @@
 import React from 'react';
 import { Typography, Grid, Paper, Box, Avatar } from '@mui/material';
-
 import AnnouncementIcon from '@mui/icons-material/Announcement';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import WorkingHours from '../../pages/WorkingHours';
 
 const Content = () => {
   return (
@@ -20,20 +22,17 @@ const Content = () => {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 2, bgcolor: '#ffffff', height: '100%' }}>
             <Typography variant="h5" gutterBottom>
-              Pomocne linki
-            </Typography>
-            <Typography variant="body1">Przydatne linki, informacje etc</Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 2, bgcolor: '#ffffff', height: '100%' }}>
-            <Typography variant="h5" gutterBottom>
               Powiadomienia
             </Typography>
             <Typography variant="body1">
               Powiadomienia dotyczące pracowników, stanowisk, umów, plików rozliczeniowych i innych.
             </Typography>
           </Paper>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+            <WorkingHours />
+          </LocalizationProvider>
         </Grid>
       </Grid>
     </Paper>
