@@ -59,7 +59,7 @@ const CreateEmployee = ({ open, onClose }) => {
     try {
       const [contracts, positions] = await Promise.all([
         requestWithNotification('get', '/employees/employmentContracts'),
-        requestWithNotification('get', '/positions/findActive')
+        requestWithNotification('get', '/positions/active')
       ]);
       setContracts(contracts);
       setPositions(positions);

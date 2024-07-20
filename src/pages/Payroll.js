@@ -5,7 +5,6 @@ import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import { Box, darken, IconButton, lighten, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import * as React from 'react';
@@ -13,8 +12,8 @@ import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import Button from '@mui/material/Button';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-// eslint-disable-next-line no-unused-vars
 import axios from 'axios';
+import AddIcon from '@mui/icons-material/Add';
 
 const Payroll = () => {
   const [filterDate, setFilterDate] = useState(dayjs());
@@ -361,7 +360,7 @@ const Payroll = () => {
                   );
                   console.log('Creating row for employee:', row.original.employeeId);
                 }}>
-                <PersonAddAltIcon />
+                <AddIcon />
               </IconButton>
             </Tooltip>
           </>

@@ -31,7 +31,7 @@ const ContractsData = ({ employee }) => {
   const fetchData = async () => {
     try {
       const [positionsData, contractsData] = await Promise.all([
-        requestWithNotification('get', '/positions/findActive'),
+        requestWithNotification('get', '/positions/active'),
         requestWithNotification('get', `/contracts/employee/${employee.id}`)
       ]);
       setPositions(positionsData);
