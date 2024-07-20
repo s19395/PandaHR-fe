@@ -5,7 +5,7 @@ import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 
 registerPlugin(FilePondPluginFileValidateType);
 
-const FileUpload = () => {
+const FileUpload = ({ maxFiles, url }) => {
   const [files, setFiles] = useState([]);
 
   return (
@@ -13,7 +13,7 @@ const FileUpload = () => {
       files={files}
       onupdatefiles={setFiles}
       allowMultiple={true}
-      maxFiles={null}
+      maxFiles={maxFiles}
       acceptedFileTypes={['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']}
       fileValidateTypeLabelExpectedTypes="Tylko pliku excel w formacie .xlsx są akceptowane"
       labelFileTypeNotAllowed="Zły format pliku"
@@ -25,7 +25,7 @@ const FileUpload = () => {
       server={{
         url: process.env.REACT_APP_ENDPOINT,
         process: {
-          url: '/timesheet/upload',
+          url: url,
           method: 'POST'
         },
         revert: (uniqueFileId, load, error) => {
