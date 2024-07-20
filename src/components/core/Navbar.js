@@ -21,11 +21,15 @@ export default function Navbar() {
     navigate('/', { replace: true });
   };
 
+  function myFunction() {
+    navigate('/', { replace: true });
+  }
+
   return (
     <>
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} onClick={myFunction}>
             PandaHR
           </Typography>
           <Button color="inherit" onClick={handleLogout}>

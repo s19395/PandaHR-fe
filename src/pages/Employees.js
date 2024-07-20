@@ -16,15 +16,10 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
-// eslint-disable-next-line no-unused-vars
-import moment from 'moment/moment';
-import { ThemeProvider } from '@mui/material/styles';
-import materialReactTableTheme from './themes/MaterialReactTableTheme';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import { DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// eslint-disable-next-line no-unused-vars
 import dayjs from 'dayjs';
 
 export default function Employees() {
@@ -242,7 +237,6 @@ export default function Employees() {
     enableDensityToggle: false,
     enableEditing: true,
     enableFullScreenToggle: false,
-    enableRowNumbers: true,
     initialState: {
       columnPinning: { left: [], right: ['mrt-row-actions'] }
     },
@@ -314,7 +308,8 @@ export default function Employees() {
         variant="contained"
         onClick={() => {
           table.setCreatingRow(true);
-        }}>
+        }}
+        sx={{ m: 2 }}>
         Stwórz pracownika
       </Button>
     ),
@@ -335,9 +330,7 @@ export default function Employees() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-      <ThemeProvider theme={materialReactTableTheme}>
-        <MaterialReactTable table={table} />
-      </ThemeProvider>
+      <MaterialReactTable table={table} />
     </LocalizationProvider>
   );
 }

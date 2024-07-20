@@ -19,12 +19,12 @@ import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 const drawerWidth = 240;
 
 const items = [
-  { text: 'Nowy pracownik', icon: <PersonAddAlt1Icon />, action: 'openPopup' },
-  { text: 'Pracownicy', icon: <PeopleIcon />, link: '/employees' },
-  { text: 'Wymiar czasu pracy', icon: <ScheduleIcon />, link: '/timesheet' },
-  { text: 'Stanowiska', icon: <WorkIcon />, link: '/positions' },
-  { text: 'Umowy', icon: <DescriptionIcon />, link: '/contracts' },
-  { text: 'Rozliczenia', icon: <CurrencyExchangeIcon />, link: '/payroll' }
+  { text: 'Nowy pracownik', icon: <PersonAddAlt1Icon color={'secondary'} />, action: 'openPopup' },
+  { text: 'Pracownicy', icon: <PeopleIcon color={'secondary'} />, link: '/employees' },
+  { text: 'Wymiar czasu pracy', icon: <ScheduleIcon color={'secondary'} />, link: '/timesheet' },
+  { text: 'Stanowiska', icon: <WorkIcon color={'secondary'} />, link: '/positions' },
+  { text: 'Umowy', icon: <DescriptionIcon color={'secondary'} />, link: '/contracts' },
+  { text: 'Rozliczenia', icon: <CurrencyExchangeIcon color={'secondary'} />, link: '/payroll' }
 ];
 
 export default function LeftDrawer() {

@@ -286,12 +286,12 @@ const Payroll = () => {
       maxSize: 400,
       size: 150
     },
-    filterFromLeafRows: true, //search for child rows and preserve parent rows
-    editDisplayMode: 'row',
+    editDisplayMode: 'row', //search for child rows and preserve parent rows
     enableColumnResizing: true,
-    enableEditing: true,
     enableDensityToggle: false,
+    enableEditing: true,
     enableExpanding: true,
+    filterFromLeafRows: true,
     initialState: {
       columnPinning: { left: [], right: ['mrt-row-actions'] },
       expanded: true,

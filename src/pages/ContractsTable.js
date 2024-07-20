@@ -297,13 +297,12 @@ const ContractsData = ({ employee }) => {
       maxSize: 9001,
       size: 50
     },
-    filterFromLeafRows: true, //search for child rows and preserve parent rows
-    editDisplayMode: 'row',
+    editDisplayMode: 'row', //search for child rows and preserve parent rows
     enableColumnPinning: true,
     enableDensityToggle: false,
     enableEditing: true,
     enableExpanding: true,
-    enableRowNumbers: true,
+    filterFromLeafRows: true,
     initialState: {
       columnPinning: { left: [], right: ['mrt-row-actions'] },
       expanded: true,

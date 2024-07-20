@@ -16,8 +16,6 @@ import {
   ListItem
 } from '@mui/material';
 import { Edit as EditIcon } from '@mui/icons-material';
-import materialReactTableTheme from './themes/MaterialReactTableTheme';
-import { ThemeProvider } from '@mui/material/styles';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import moment from 'moment';
 import PositionDuty from './PositionDuty';
@@ -137,9 +135,6 @@ export default function Position() {
 
   const table = useMaterialReactTable({
     columns,
-    muiDetailPanelProps: {
-      sx: { padding: '0px 50px' }
-    },
     createDisplayMode: 'modal',
     data: fetchedPositions,
     editDisplayMode: 'modal',
@@ -156,6 +151,9 @@ export default function Position() {
       expanded: true
     },
     localization: MRT_Localization_PL,
+    muiDetailPanelProps: {
+      sx: { padding: '0px 50px' }
+    },
     muiExpandButtonProps: ({ row }) => ({
       sx: {
         display:
@@ -253,7 +251,7 @@ export default function Position() {
       </Box>
     ),
     renderTopToolbarCustomActions: ({ table }) => (
-      <Button variant="contained" onClick={() => table.setCreatingRow(true)}>
+      <Button variant="contained" onClick={() => table.setCreatingRow(true)} sx={{ m: 2 }}>
         Stwórz stanowisko
       </Button>
     ),
@@ -264,9 +262,5 @@ export default function Position() {
     }
   });
 
-  return (
-    <ThemeProvider theme={materialReactTableTheme}>
-      <MaterialReactTable table={table} />
-    </ThemeProvider>
-  );
+  return <MaterialReactTable table={table} />;
 }

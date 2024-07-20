@@ -252,7 +252,6 @@ export default function Timesheet() {
     enableFullScreenToggle: false,
     enableGlobalFilter: false,
     enableGrouping: true,
-    enableRowNumbers: true,
     initialState: {
       columnPinning: { left: [], right: ['mrt-row-actions'] }
     },
