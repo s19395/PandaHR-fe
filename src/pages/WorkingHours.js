@@ -5,47 +5,32 @@ import { DatePicker } from '@mui/x-date-pickers';
 import 'dayjs/locale/pl';
 import TextField from '@mui/material/TextField';
 import FileUpload from '../components/common/FileUpload';
-import 'filepond/dist/filepond.min.css';
+import { useRequestWithNotification } from '../helper/AxiosHelper';
 
+const localeData = require('dayjs/plugin/localeData');
 dayjs.locale('pl');
+dayjs.extend(localeData);
 
 const WorkingHours = () => {
   const [selectedYear, setSelectedYear] = useState(dayjs());
   const [loading, setLoading] = useState(false);
-
-  const workingHours = {
-    '2024-01': 168,
-    '2024-02': 160,
-    '2024-03': 176,
-    '2024-04': 168,
-    '2024-05': 160,
-    '2024-06': 168,
-    '2024-07': 176,
-    '2024-08': 160,
-    '2024-09': 168,
-    '2024-10': 176,
-    '2024-11': 160,
-    '2024-12': 168
-  };
-
-  const start = dayjs(selectedYear).startOf('year');
-  const end = dayjs(selectedYear).endOf('year');
-
-  const months = [];
-  let current = start;
-  while (current.isBefore(end, 'month') || current.isSame(end, 'month')) {
-    months.push(current);
-    current = current.add(1, 'month');
-  }
+  const [workingHours, setWorkingHours] = useState({});
+  const requestWithNotification = useRequestWithNotification();
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const data = await requestWithNotification(
+        'get',
+        `/workingHours?year=${dayjs(selectedYear).year()}`
+      );
+      setWorkingHours(data);
       setLoading(false);
-    }, 500); // Simulate data loading delay
+    };
+    fetchData();
   }, [selectedYear]);
 
-  const hasData = months.some((month) => workingHours[month.format('YYYY-MM')] !== undefined);
+  const monthNames = dayjs.months();
 
   return (
     <Paper
@@ -71,17 +56,16 @@ const WorkingHours = () => {
             }}>
             <CircularProgress />
           </Box>
-        ) : hasData ? (
+        ) : workingHours.length > 0 ? (
           <Grid container spacing={3}>
-            {months.map((month) => {
-              const formattedMonth = month.format('YYYY-MM');
-              const hours = workingHours[formattedMonth];
+            {workingHours.map(({ month, hours }) => {
+              const monthName = monthNames[month - 1];
 
               return (
-                <Grid item xs={12} sm={6} md={3} key={formattedMonth}>
+                <Grid item xs={12} sm={6} md={3} key={`${selectedYear.year()}-${month}`}>
                   <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f5f5f5', borderRadius: 2 }}>
                     <Typography variant="h6" sx={{ mb: 1 }}>
-                      {month.format('MMMM')}
+                      {monthName}
                     </Typography>
                     <Typography variant="body1" color="primary">
                       {hours !== undefined ? `${hours}h` : 'No data'}
@@ -105,7 +89,10 @@ const WorkingHours = () => {
               sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
               Brak danych dostępnych o wymiarze czasu pracy dla wybranego roku
             </Typography>
-            <FileUpload />
+            <FileUpload
+              maxFiles={1}
+              url={`/workingHours/upload?year=${dayjs(selectedYear).year()}`}
+            />
           </Box>
         )}
       </Box>
