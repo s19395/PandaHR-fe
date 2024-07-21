@@ -32,7 +32,7 @@ const Payroll = () => {
         'get',
         `/payroll?date=${encodeURIComponent(normalizedDate)}`
       );
-      console.log(payroll);
+
       setPayroll(payroll);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -358,7 +358,6 @@ const Payroll = () => {
                       row.depth + 1
                     )
                   );
-                  console.log('Creating row for employee:', row.original.employeeId);
                 }}>
                 <AddIcon />
               </IconButton>
@@ -413,7 +412,6 @@ const Payroll = () => {
 
 async function handleExportData(type, filterDate) {
   try {
-    console.log('Clicked', type);
     const normalizedDate = filterDate.format('YYYY-MM-DD');
     const response = await axios.get(
       `/payroll/export?date=${encodeURIComponent(normalizedDate)}&type=${type}`,
@@ -428,7 +426,6 @@ async function handleExportData(type, filterDate) {
       const contentDisposition = response.headers['content-disposition'];
       if (contentDisposition) {
         const fileName = contentDisposition.split('filename=')[1].split(';')[0].replace(/"/g, '');
-        console.log(fileName);
         link.download = fileName.trim();
         link.click();
       } else {

@@ -60,8 +60,6 @@ const Contracts = () => {
 
   useEffect(() => {
     fetchData();
-
-    console.log(employee);
   }, [employee]);
 
   const handleCreateContract = async ({ values, row, table }) => {
@@ -188,11 +186,8 @@ const Contracts = () => {
   };
 
   function transformValuesToPandaContractDto(values) {
-    console.log(values);
-    console.log(positions);
-
     const positionDto = positions.find((position) => position.name === values.positionName);
-    console.log(positionDto);
+
     const earningConditionsDto = {
       hourlyRate: values.hourlyRate,
       bonus: values.bonus,
