@@ -4,7 +4,7 @@ import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 
-const EmployeeSearch = ({ onEmployeeSelect }) => {
+const EmployeeSearch = ({ onEmployeeSelect, sx }) => {
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
@@ -52,7 +52,7 @@ const EmployeeSearch = ({ onEmployeeSelect }) => {
   return (
     <Autocomplete
       id="asynchronous-demo"
-      sx={{ width: 300, mt: 2 }}
+      sx={{ width: 300, mt: 2, ...sx }}
       open={open}
       onOpen={() => {
         setOpen(true);

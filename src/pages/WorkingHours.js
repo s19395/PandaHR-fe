@@ -42,7 +42,7 @@ const WorkingHours = () => {
         views={['year']}
         value={selectedYear}
         onChange={(newDate) => setSelectedYear(newDate)}
-        renderInput={(params) => <TextField {...params} fullWidth />}
+        textfieldComponent={(props) => <TextField {...props} fullWidth />}
       />
 
       <Box sx={{ mt: 2, flexGrow: 1 }}>

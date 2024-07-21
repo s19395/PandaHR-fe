@@ -25,7 +25,7 @@ export const useRequestWithNotification = () => {
 
       return response.data.data;
     } catch (error) {
-      if (error.response.data.trace.includes('com.auth0.jwt.exceptions.TokenExpiredException')) {
+      if (error.response.data.trace?.includes('com.auth0.jwt.exceptions.TokenExpiredException')) {
         setAlert({
           open: true,
           severity: 'error',

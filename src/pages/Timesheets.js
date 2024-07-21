@@ -275,7 +275,7 @@ export default function Timesheet() {
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
         <DialogTitle variant="h5">Dodaj ewidencje</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column' }}>
           <EmployeeSearch onEmployeeSelect={(newValue) => (row.original.employeeId = newValue)} />
           {internalEditComponents.filter(
             (component) =>

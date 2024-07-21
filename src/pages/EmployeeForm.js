@@ -178,7 +178,7 @@ const CreateEmployee = ({ open, onClose }) => {
   }
 
   function transformValuesToContractDto(formValues) {
-    const positionDto = positions.find((position) => position.title === formValues.position);
+    const positionDto = positions.find((position) => position.name === formValues.position);
 
     return {
       positionDto: positionDto,
@@ -314,8 +314,8 @@ const CreateEmployee = ({ open, onClose }) => {
                   <Typography variant="body1">Brak</Typography>
                 </MenuItem>
                 {positions.map((position) => (
-                  <MenuItem key={position.title} value={position.title}>
-                    {position.title}
+                  <MenuItem key={position.name} value={position.name}>
+                    {position.name}
                   </MenuItem>
                 ))}
               </TextField>
