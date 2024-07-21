@@ -43,7 +43,7 @@ const initialFormValues = {
   bonusThreshold: ''
 };
 
-const CreateEmployee = ({ open, onClose }) => {
+const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [formValues, setFormValues] = useState(initialFormValues);
   const [errors, setErrors] = useState({});
@@ -155,14 +155,19 @@ const CreateEmployee = ({ open, onClose }) => {
   };
 
   const handleSubmit = async () => {
-    const employeeDto = transformValuesToEmployeeDto(formValues);
-    const contractDto = transformValuesToContractDto(formValues);
+    try {
+      const employeeDto = transformValuesToEmployeeDto(formValues);
+      const contractDto = transformValuesToContractDto(formValues);
 
-    await requestWithNotification('post', `/employees/createWithContract`, {
-      employeeDto,
-      contractDto
-    });
-    handleReset();
+      await requestWithNotification('post', `/employees/createWithContract`, {
+        employeeDto,
+        contractDto
+      });
+      onEmployeeCreated({ employeeDto });
+      handleReset();
+    } catch (error) {
+      console.error('Error creating employee:', error);
+    }
   };
 
   function transformValuesToEmployeeDto(formValues) {

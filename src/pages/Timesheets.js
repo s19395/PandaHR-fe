@@ -380,7 +380,7 @@ export const UploadPopUp = () => {
       </Button>
       <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="md" fullWidth>
         <DialogContent>
-          <FileUpload maxFiles={null} url={'/timesheet/upload'} />
+          <FileUpload maxFiles={50} url={'/timesheet/upload'} />
         </DialogContent>
       </Dialog>
     </>

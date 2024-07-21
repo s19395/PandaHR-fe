@@ -21,6 +21,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
+import CreateEmployee from './EmployeeForm';
 
 export default function Employees() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -29,6 +30,15 @@ export default function Employees() {
   const [isLoadingEmployeesError, setIsLoadingEmployeesError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const requestWithNotification = useRequestWithNotification();
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const employmentContracts = ['', 'Umowa Zlecenie', 'Umowa o Pracę'];
 
@@ -169,21 +179,8 @@ export default function Employees() {
     [validationErrors]
   );
 
-  const handleCreateEmployee = async ({ values, table }) => {
-    const newValidationErrors = validateEmployee(values);
-    if (Object.values(newValidationErrors).some((error) => error)) {
-      setValidationErrors(newValidationErrors);
-      return;
-    }
-    setValidationErrors({});
-    setIsSaving(true);
-    try {
-      const newEmployee = await requestWithNotification('post', '/employees', values, true);
-      setFetchedEmployees((prev) => [...prev, newEmployee]);
-      table.setCreatingRow(null);
-    } catch (error) {
-      // Error handling is done in requestWithNotification
-    }
+  const handleCreateEmployee = async ({ employeeDto }) => {
+    setFetchedEmployees((prev) => [...prev, employeeDto]);
     setIsSaving(false);
   };
 
@@ -253,25 +250,9 @@ export default function Employees() {
         }
       : undefined,
     onCreatingRowCancel: () => setValidationErrors({}),
-    onCreatingRowSave: handleCreateEmployee,
     onEditingRowCancel: () => setValidationErrors({}),
     onEditingRowSave: handleSaveEmployee,
     positionActionsColumn: 'last',
-    renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
-      <>
-        <DialogTitle variant="h5">Nowy pracownik</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {internalEditComponents.filter(
-            (component) =>
-              !['id', 'age'].includes(component.props.cell.column.columnDef.accessorKey) &&
-              !['Wiek', 'Adres zamieszkania'].includes(component.props.cell.column.columnDef.header)
-          )}
-        </DialogContent>
-        <DialogActions>
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
-        </DialogActions>
-      </>
-    ),
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
         <DialogTitle variant="h5">Edycja pracownika</DialogTitle>
@@ -303,13 +284,8 @@ export default function Employees() {
         </Tooltip>
       </Box>
     ),
-    renderTopToolbarCustomActions: ({ table }) => (
-      <Button
-        variant="contained"
-        onClick={() => {
-          table.setCreatingRow(true);
-        }}
-        sx={{ m: 2 }}>
+    renderTopToolbarCustomActions: () => (
+      <Button variant="contained" onClick={handleOpen} sx={{ m: 2 }}>
         Stwórz pracownika
       </Button>
     ),
@@ -329,9 +305,16 @@ export default function Employees() {
   });
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-      <MaterialReactTable table={table} />
-    </LocalizationProvider>
+    <>
+      <CreateEmployee
+        open={open}
+        onClose={handleClose}
+        onEmployeeCreated={handleCreateEmployee}
+      />
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+        <MaterialReactTable table={table} />
+      </LocalizationProvider>
+    </>
   );
 }
 
