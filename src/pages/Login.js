@@ -8,8 +8,6 @@ import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
 import * as React from 'react';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import { useNavigate } from 'react-router-dom';
@@ -19,9 +17,9 @@ const Login = () => {
   const requestWithNotification = useRequestWithNotification();
   const navigate = useNavigate();
 
-  // Use the useState hook to manage state
   const [login, setLogin] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [rememberMe, setRememberMe] = React.useState(false);
   const [loginError, setLoginError] = React.useState(false);
   const [passwordError, setPasswordError] = React.useState(false);
 
@@ -30,7 +28,8 @@ const Login = () => {
     try {
       const data = await requestWithNotification('POST', '/login', {
         login,
-        password
+        password,
+        rememberMe
       });
       setToken(data.token); // Wait for the token to be set
       navigate('/', { replace: true });
@@ -87,6 +86,9 @@ const Login = () => {
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
+            id="rememberMe"
+            value={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
           />
           <Button
             type="submit"
@@ -96,18 +98,6 @@ const Login = () => {
             onClick={(e) => handleLogin(e)}>
             Sign In
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="#" variant="body2">
-                No account? Sign up
-              </Link>
-            </Grid>
-          </Grid>
         </Box>
       </Box>
     </Container>
