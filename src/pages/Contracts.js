@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import { MaterialReactTable, createRow, useMaterialReactTable } from 'material-react-table';
 import { Box, Button, IconButton, Tooltip, darken, lighten } from '@mui/material';
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
@@ -408,7 +408,7 @@ const Contracts = () => {
                   )
                 );
               }}>
-              <PersonAddAltIcon />
+              <AddIcon />
             </IconButton>
           </Tooltip>
         )}
@@ -416,7 +416,6 @@ const Contracts = () => {
     ),
     renderTopToolbarCustomActions: ({ table }) => (
       <Button
-        startIcon={<PersonAddAltIcon />}
         variant="contained"
         onClick={() => {
           setCreatingRowIndex(table.getRowModel().rows.length);

@@ -33,7 +33,7 @@ export default function Navbar() {
             PandaHR
           </Typography>
           <Button color="inherit" onClick={handleLogout}>
-            Logout
+            Wyloguj
           </Button>
         </Toolbar>
       </AppBar>
