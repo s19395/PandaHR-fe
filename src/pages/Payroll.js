@@ -134,16 +134,21 @@ const Payroll = () => {
         accessorKey: 'workedHours',
         header: 'Liczba godzin',
         enableEditing: false,
-        Cell: ({ cell }) => (
-          <>
-            {cell.getValue()
-              ? `${cell.getValue().toLocaleString({
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2
-                })} h`
-              : ''}
-          </>
-        )
+        Cell: ({ cell, row }) => {
+          const workedHours = cell.getValue();
+          const employmentContract = row.original.employmentContract;
+
+          if (employmentContract === 'Umowa o Pracę') {
+            const hours = Math.floor(workedHours);
+            const minutes = Math.round((workedHours - hours) * 60);
+            return `${hours}h ${minutes} min`;
+          } else {
+            return `${workedHours.toLocaleString({
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 2
+            })}h`;
+          }
+        }
       },
       {
         accessorKey: 'grossPay',
