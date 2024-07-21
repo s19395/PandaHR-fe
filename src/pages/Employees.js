@@ -115,9 +115,10 @@ export default function Employees() {
               label="Data urodzenia"
               defaultValue={dayjs(row._valuesCache.dateOfBirth)}
               onChange={(newValue) => (row._valuesCache[column.id] = newValue)}
-              sx={{ mt: 2 }}
+              sx={{ mb: 2 }}
               slotProps={{
                 textField: {
+                  variant: 'standard',
                   error: !!validationErrors?.dateOfBirth,
                   helperText: validationErrors?.dateOfBirth
                 }
@@ -227,9 +228,8 @@ export default function Employees() {
 
   const table = useMaterialReactTable({
     columns,
-    createDisplayMode: 'modal',
     data: fetchedEmployees,
-    editDisplayMode: 'modal',
+    editDisplayMode: 'row',
     enableColumnPinning: true,
     enableDensityToggle: false,
     enableEditing: true,

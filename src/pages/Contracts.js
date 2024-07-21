@@ -16,6 +16,8 @@ import 'dayjs/locale/pl';
 import DescriptionIcon from '@mui/icons-material/Description';
 import axios from 'axios';
 import EmployeeSearch from './EmployeeSearch';
+import dayjs from 'dayjs';
+import { DatePicker } from '@mui/x-date-pickers';
 
 const Contracts = () => {
   const [employee, setEmployee] = useState();
@@ -40,6 +42,7 @@ const Contracts = () => {
       if (!employee) {
         setContracts([]);
       } else {
+        console.log(employee);
         const contractsData = await requestWithNotification(
           'get',
           `/contracts/employee/${employee.id}`
@@ -221,42 +224,90 @@ const Contracts = () => {
         enableEditing: false
       },
       {
-        accessorFn: (row) => new Date(row.validFrom),
-        header: 'Data od',
+        accessorKey: 'validFrom',
         id: 'validFrom',
-        filterVariant: 'date-range',
-        Cell: ({ cell }) => cell.getValue().toLocaleDateString(),
-        muiEditTextFieldProps: {
-          variant: 'standard',
-          type: 'date',
-          InputLabelProps: { shrink: true }
+        header: 'Data od',
+        Cell: ({ row }) => (
+          <span>
+            {row.original.validFrom
+              ? dayjs(row.original.validFrom).format('DD.MM.YYYY').toString()
+              : ''}
+          </span>
+        ),
+        Edit: ({ column, row }) => {
+          return (
+            <DatePicker
+              label="Data od"
+              defaultValue={dayjs(row._valuesCache.validFrom)}
+              onChange={(newValue) => (row._valuesCache[column.id] = newValue)}
+              sx={{ mb: 2 }}
+              slotProps={{
+                textField: {
+                  variant: 'standard',
+                  error: !!validationErrors?.validFrom,
+                  helperText: validationErrors?.validFrom
+                }
+              }}
+            />
+          );
         }
       },
       {
-        accessorFn: (row) => (row.validTo ? new Date(row.validTo) : ''),
+        accessorKey: 'validTo',
         id: 'validTo',
         header: 'Data do',
-        filterVariant: 'date-range',
-        Cell: ({ cell }) => (cell.getValue() ? cell.getValue().toLocaleDateString() : ''),
-        muiEditTextFieldProps: ({ row }) => ({
-          variant: 'standard',
-          type: 'date',
-          InputLabelProps: { shrink: true },
-          sx: {
-            display: row.depth === 0 ? 'flex' : 'none'
-          }
-        })
+        Cell: ({ row }) => (
+          <span>
+            {row.original.validTo && employee?.employmentContract === 'Umowa Zlecenie'
+              ? dayjs(row.original.validTo).format('DD.MM.YYYY').toString()
+              : ''}
+          </span>
+        ),
+        Edit: ({ column, row }) => {
+          return employee?.employmentContract === 'Umowa Zlecenie' ? (
+            <DatePicker
+              label="Data do"
+              defaultValue={dayjs(row._valuesCache.validTo)}
+              onChange={(newValue) => (row._valuesCache[column.id] = newValue)}
+              sx={{ mb: 2 }}
+              slotProps={{
+                textField: {
+                  variant: 'standard',
+                  error: !!validationErrors?.validTo,
+                  helperText: validationErrors?.validTo
+                }
+              }}
+            />
+          ) : null;
+        }
       },
       {
-        accessorFn: (row) => new Date(row.signedAt),
-        header: 'Data zawarcia',
+        accessorKey: 'signedAt',
         id: 'signedAt',
-        filterVariant: 'date-range',
-        Cell: ({ cell }) => cell.getValue().toLocaleDateString(),
-        muiEditTextFieldProps: {
-          variant: 'standard',
-          type: 'date',
-          InputLabelProps: { shrink: true }
+        header: 'Data zawarcia',
+        Cell: ({ row }) => (
+          <span>
+            {row.original.signedAt
+              ? dayjs(row.original.signedAt).format('DD.MM.YYYY').toString()
+              : ''}
+          </span>
+        ),
+        Edit: ({ column, row }) => {
+          return (
+            <DatePicker
+              label="Data zawarcia"
+              defaultValue={dayjs(row._valuesCache.signedAt)}
+              onChange={(newValue) => (row._valuesCache[column.id] = newValue)}
+              sx={{ mb: 2 }}
+              slotProps={{
+                textField: {
+                  variant: 'standard',
+                  error: !!validationErrors?.signedAt,
+                  helperText: validationErrors?.signedAt
+                }
+              }}
+            />
+          );
         }
       },
       {
@@ -267,6 +318,7 @@ const Contracts = () => {
         muiEditTextFieldProps: ({ row }) => ({
           select: true,
           sx: {
+            mt: 0.25,
             display: row.depth === 0 ? 'flex' : 'none'
           }
         })
@@ -310,10 +362,11 @@ const Contracts = () => {
     createDisplayMode: 'row',
     data: contracts,
     defaultColumn: {
-      minSize: 20,
+      minSize: 50,
       maxSize: 9001,
-      size: 50
+      size: 150
     },
+    enableColumnResizing: true,
     editDisplayMode: 'row',
     enableColumnPinning: true,
     enableDensityToggle: false,
@@ -342,6 +395,14 @@ const Contracts = () => {
         )
       })
     }),
+    displayColumnDefOptions: {
+      'mrt-row-actions': {
+        size: 140
+      },
+      'mrt-row-expand': {
+        size: 50
+      }
+    },
     muiTableContainerProps: {
       sx: {
         minHeight: '500px'
