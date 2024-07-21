@@ -306,11 +306,7 @@ export default function Employees() {
 
   return (
     <>
-      <CreateEmployee
-        open={open}
-        onClose={handleClose}
-        onEmployeeCreated={handleCreateEmployee}
-      />
+      <CreateEmployee open={open} onClose={handleClose} onEmployeeCreated={handleCreateEmployee} />
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
         <MaterialReactTable table={table} />
       </LocalizationProvider>
