@@ -61,7 +61,7 @@ export const step1Schema = Yup.object({
     }),
   bonusThreshold: Yup.number()
     .min(0, 'Próg premii nie może być ujemny')
-    .max(10, 'Próg premii nie może przekraczać 10%')
+    .max(10, 'Próg premii nie może przekraczać 10 dni')
     .when('bonusEnabled', {
       is: true,
       then: (schema) =>

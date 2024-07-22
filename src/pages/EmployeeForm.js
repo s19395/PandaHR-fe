@@ -455,7 +455,7 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
                             type="number"
                             fullWidth
                             InputProps={{
-                              startAdornment: <InputAdornment position="start">PLN</InputAdornment>
+                              startAdornment: <InputAdornment position="start">dni</InputAdornment>
                             }}
                             {...field}
                             margin="normal"
