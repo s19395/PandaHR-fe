@@ -236,6 +236,9 @@ export default function Employees() {
       columnPinning: { left: [], right: ['mrt-row-actions'] }
     },
     localization: MRT_Localization_PL,
+    mrtTheme: () => ({
+      baseBackgroundColor: '#1b1d1e'
+    }),
     muiTableContainerProps: {
       sx: {
         minHeight: '500px'
@@ -283,7 +286,7 @@ export default function Employees() {
       </Box>
     ),
     renderTopToolbarCustomActions: () => (
-      <Button variant="contained" color={'secondary'} onClick={handleOpen} sx={{ m: 2 }}>
+      <Button variant="contained" onClick={handleOpen} sx={{ m: 2 }}>
         Stwórz pracownika
       </Button>
     ),

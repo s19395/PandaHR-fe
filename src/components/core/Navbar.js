@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import { useAuth } from '../../helper/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import { useAlert } from '../../helper/AlertProvider';
+import AnnouncementIcon from '@mui/icons-material/Announcement';
 
 export default function Navbar() {
   const { setToken } = useAuth();
@@ -27,10 +28,22 @@ export default function Navbar() {
 
   return (
     <>
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar
+        position="fixed"
+        color="primary"
+        enableColorOnDark
+        sx={{
+          backgroundColor: 'primary.dark',
+          backgroundImage: 'none',
+          zIndex: (theme) => theme.zIndex.drawer + 1
+        }}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} onClick={myFunction}>
-            PandaHR
+          <Typography component="div" variant="h5" sx={{ flexGrow: 1 }} onClick={myFunction}>
+            <Typography component="div" variant="h5">
+              <AnnouncementIcon sx={{ fontSize: 25, transform: 'scaleX(-1)' }} />
+              <span style={{ color: '#cdcbc9' }}>Panda</span>
+              <span style={{ color: 'primary', fontWeight: 'bold' }}>HR</span>
+            </Typography>
           </Typography>
           <Button color="inherit" onClick={handleLogout}>
             Wyloguj

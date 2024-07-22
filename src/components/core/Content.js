@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Grid, Paper, Box, Avatar } from '@mui/material';
+import { Typography, Grid, Paper, Box } from '@mui/material';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 import WorkingHours from '../../pages/WorkingHours';
 
@@ -9,11 +9,15 @@ const Content = () => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <Avatar sx={{ bgcolor: '#6D1B7B', width: 60, height: 60, mr: 2 }}>
-              <AnnouncementIcon sx={{ fontSize: 40 }} />
-            </Avatar>
+            <AnnouncementIcon
+              color={'primary'}
+              sx={{ mb: 2, fontSize: 55, transform: 'scaleX(-1)' }}
+            />
             <Typography variant="h3" gutterBottom sx={{ mt: 2 }}>
-              PandaHR
+              <Typography color={'primary'} variant="h3" gutterBottom sx={{ mt: 2 }}>
+                <span style={{ color: '#cdcbc9' }}>Panda</span>
+                <span style={{ color: 'primary', fontWeight: 'bold' }}>HR</span>
+              </Typography>
             </Typography>
           </Box>
         </Grid>

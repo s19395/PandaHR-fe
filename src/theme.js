@@ -2,19 +2,51 @@
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
+  components: {
+    MuiPaper: {
+      defaultProps: {
+        sx: {
+          backgroundImage: 'none'
+        }
+      },
+      styleOverrides: {
+        elevation0: {
+          backgroundImage: 'none',
+          backgroundColor: '#181a1b'
+        },
+        elevation1: {
+          backgroundImage: 'none',
+          backgroundColor: '#1b1d1e'
+        },
+        elevation2: {
+          backgroundImage: 'none',
+          backgroundColor: '#1b1d1e'
+        },
+        elevation3: {
+          backgroundImage: 'none',
+          backgroundColor: '#181a1b'
+        }
+      }
+    }
+  },
   palette: {
-    mode: 'light',
+    mode: 'dark',
     primary: {
-      main: '#34207d'
-    },
-    secondary: {
-      main: '#6D1B7B'
+      main: '#851d97',
+      dark: '#571662'
     },
     background: {
-      default: '#fafafa',
-      paper: '#fafafa'
+      default: '#181a1b',
+      paper: '#1b1d1e'
     },
-    divider: 'rgba(0,0,0,0.3)'
+    secondary: {
+      main: '#d47fe3',
+      dark: '#571662'
+    },
+    text: {
+      primary: '#cdcbc9',
+      secondary: '#cdcbc9'
+    }
   }
 });
 

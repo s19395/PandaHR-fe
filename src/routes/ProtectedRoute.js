@@ -30,7 +30,7 @@ export const ProtectedRoute = () => {
           maxHeight: '100%',
           overflow: 'auto'
         }}>
-        <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+        <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
           <Outlet />
         </Paper>
       </Box>

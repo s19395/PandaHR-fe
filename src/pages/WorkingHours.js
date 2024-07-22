@@ -62,7 +62,7 @@ const WorkingHours = () => {
 
               return (
                 <Grid item xs={12} sm={6} md={3} key={`${selectedYear.year()}-${month}`}>
-                  <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#f5f5f5', borderRadius: 2 }}>
+                  <Paper sx={{ p: 2, textAlign: 'center', borderRadius: 2 }}>
                     <Typography variant="h6" sx={{ mb: 1 }}>
                       {monthName}
                     </Typography>

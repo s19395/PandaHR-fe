@@ -361,9 +361,17 @@ const Contracts = () => {
       maxSize: 9001,
       size: 150
     },
-    enableColumnResizing: true,
+    displayColumnDefOptions: {
+      'mrt-row-actions': {
+        size: 140
+      },
+      'mrt-row-expand': {
+        size: 50
+      }
+    },
     editDisplayMode: 'row',
     enableColumnPinning: true,
+    enableColumnResizing: true,
     enableDensityToggle: false,
     enableEditing: true,
     enableExpanding: true,
@@ -374,6 +382,9 @@ const Contracts = () => {
       pagination: { pageSize: 20, pageIndex: 0 }
     },
     localization: MRT_Localization_PL,
+    mrtTheme: () => ({
+      baseBackgroundColor: '#1b1d1e'
+    }),
     muiExpandButtonProps: ({ row }) => ({
       sx: {
         display:
@@ -384,20 +395,12 @@ const Contracts = () => {
     }),
     muiTableBodyRowProps: ({ row }) => ({
       sx: (theme) => ({
-        backgroundColor: darken(
-          lighten(theme.palette.background.paper, 0.1),
-          row.depth * (theme.palette.mode === 'dark' ? 0.2 : 0.1)
+        backgroundColor: lighten(
+          darken(theme.palette.background.paper, 0.01),
+          row.depth * (theme.palette.mode === 'dark' ? 0.05 : 0.1)
         )
       })
     }),
-    displayColumnDefOptions: {
-      'mrt-row-actions': {
-        size: 140
-      },
-      'mrt-row-expand': {
-        size: 50
-      }
-    },
     muiTableContainerProps: {
       sx: {
         minHeight: '500px'
@@ -413,26 +416,6 @@ const Contracts = () => {
     onCreatingRowSave: handleCreateContract,
     onEditingRowCancel: () => setValidationErrors({}),
     onEditingRowSave: handleSaveContract,
-    renderTopToolbar: () => (
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          ml: 2
-        }}>
-        <EmployeeSearch onEmployeeSelect={handleEmployeeSelect} sx={{ m: 2 }} />
-        {employee && (
-          <Button
-            variant="contained"
-            color={'secondary'}
-            onClick={() => table.setCreatingRow(true)}
-            sx={{ m: 2 }}>
-            Utwórz nową umowę
-          </Button>
-        )}
-      </Box>
-    ),
     positionCreatingRow: creatingRowIndex,
     renderRowActions: ({ row, staticRowIndex, table }) => (
       <Box sx={{ display: 'flex' }}>
@@ -471,6 +454,22 @@ const Contracts = () => {
               <AddIcon />
             </IconButton>
           </Tooltip>
+        )}
+      </Box>
+    ),
+    renderTopToolbar: () => (
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          ml: 2
+        }}>
+        <EmployeeSearch onEmployeeSelect={handleEmployeeSelect} sx={{ m: 2 }} />
+        {employee && (
+          <Button variant="contained" onClick={() => table.setCreatingRow(true)} sx={{ m: 2 }}>
+            Utwórz nową umowę
+          </Button>
         )}
       </Box>
     ),

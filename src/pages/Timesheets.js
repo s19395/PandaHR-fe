@@ -253,6 +253,9 @@ export default function Timesheet() {
       columnPinning: { left: [], right: ['mrt-row-actions'] }
     },
     localization: MRT_Localization_PL,
+    mrtTheme: () => ({
+      baseBackgroundColor: '#1b1d1e'
+    }),
     muiTableContainerProps: {
       sx: {
         minHeight: '500px'
@@ -322,7 +325,6 @@ export default function Timesheet() {
           <UploadPopUp />
           <Button
             variant="contained"
-            color={'secondary'}
             onClick={() => {
               table.setCreatingRow(true);
             }}>
@@ -366,7 +368,7 @@ export const UploadPopUp = () => {
 
   return (
     <>
-      <Button color={'secondary'} variant="contained" onClick={handleOpenModal}>
+      <Button variant="contained" onClick={handleOpenModal}>
         Import
       </Button>
       <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="md" fullWidth>

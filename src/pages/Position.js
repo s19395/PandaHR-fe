@@ -151,6 +151,9 @@ export default function Position() {
       expanded: true
     },
     localization: MRT_Localization_PL,
+    mrtTheme: () => ({
+      baseBackgroundColor: '#1b1d1e'
+    }),
     muiDetailPanelProps: {
       sx: { padding: '0px 50px' }
     },
@@ -251,11 +254,7 @@ export default function Position() {
       </Box>
     ),
     renderTopToolbarCustomActions: ({ table }) => (
-      <Button
-        variant="contained"
-        color={'secondary'}
-        onClick={() => table.setCreatingRow(true)}
-        sx={{ m: 2 }}>
+      <Button variant="contained" onClick={() => table.setCreatingRow(true)} sx={{ m: 2 }}>
         Stwórz stanowisko
       </Button>
     ),

@@ -165,10 +165,10 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
               key={label}
               sx={{
                 '& .MuiStepLabel-root .Mui-completed': {
-                  color: 'secondary.dark'
+                  color: 'primary.dark'
                 },
                 '& .MuiStepLabel-root .Mui-active': {
-                  color: 'secondary.main'
+                  color: 'primary.main'
                 }
               }}>
               <StepLabel>{label}</StepLabel>
@@ -586,11 +586,13 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
         </Box>
       </DialogContent>
       <DialogActions sx={{ mr: 2 }}>
-        <Button onClick={handleReset}>Anuluj</Button>
+        <Button variant={'outlined'} onClick={handleReset}>
+          Anuluj
+        </Button>
         <Button onClick={handleBack} disabled={activeStep === 0}>
           Wstecz
         </Button>
-        <Button onClick={handleNext} color="secondary" variant="contained">
+        <Button onClick={handleNext} color="primary" variant="contained">
           {activeStep === steps.length - 1 ? 'Zapisz' : 'Dalej'}
         </Button>
       </DialogActions>

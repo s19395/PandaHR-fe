@@ -292,8 +292,8 @@ const Payroll = () => {
       maxSize: 400,
       size: 150
     },
-    editDisplayMode: 'row', //search for child rows and preserve parent rows
-    enableColumnResizing: true,
+    editDisplayMode: 'row',
+    enableColumnResizing: true, //search for child rows and preserve parent rows
     enableDensityToggle: false,
     enableEditing: true,
     enableExpanding: true,
@@ -304,6 +304,9 @@ const Payroll = () => {
       pagination: { pageSize: 20, pageIndex: 0 }
     },
     localization: MRT_Localization_PL,
+    mrtTheme: () => ({
+      baseBackgroundColor: '#1b1d1e'
+    }),
     muiExpandButtonProps: ({ row }) => ({
       sx: {
         display:
@@ -314,9 +317,9 @@ const Payroll = () => {
     }),
     muiTableBodyRowProps: ({ row }) => ({
       sx: (theme) => ({
-        backgroundColor: darken(
-          lighten(theme.palette.background.paper, 1),
-          row.depth * (theme.palette.mode === 'dark' ? 0.05 : 0.05)
+        backgroundColor: lighten(
+          darken(theme.palette.background.paper, 0.01),
+          row.depth * (theme.palette.mode === 'dark' ? 0.05 : 0.1)
         )
       })
     }),
@@ -387,14 +390,14 @@ const Payroll = () => {
           sx={{ m: 2 }}
         />
         <Button
-          color={'secondary'}
+          variant={'contained'}
           onClick={() => handleExportData('settlements', filterDate)}
           startIcon={<FileDownloadIcon />}
           sx={{ ml: 2 }}>
           Plik rozliczeniowy
         </Button>
         <Button
-          color={'secondary'}
+          variant={'contained'}
           onClick={() => handleExportData('accounting', filterDate)}
           startIcon={<FileDownloadIcon />}
           sx={{ ml: 2 }}>
