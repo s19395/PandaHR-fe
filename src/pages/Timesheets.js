@@ -21,7 +21,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
-import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 import EmployeeSearch from './EmployeeSearch';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -318,14 +317,12 @@ export default function Timesheet() {
       </Box>
     ),
     renderTopToolbarCustomActions: () => (
-      <Box sx={{ textAlign: 'left', ml: 2 }}>
-        <Typography variant="h6" gutterBottom>
-          Wprowadź dane
-        </Typography>
+      <Box sx={{ textAlign: 'left', m: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'left', gap: 2 }}>
           <UploadPopUp />
           <Button
             variant="contained"
+            color={'secondary'}
             onClick={() => {
               table.setCreatingRow(true);
             }}>
@@ -369,7 +366,7 @@ export const UploadPopUp = () => {
 
   return (
     <>
-      <Button variant="contained" onClick={handleOpenModal}>
+      <Button color={'secondary'} variant="contained" onClick={handleOpenModal}>
         Import
       </Button>
       <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="md" fullWidth>

@@ -384,12 +384,14 @@ const Payroll = () => {
           sx={{ m: 2 }}
         />
         <Button
+          color={'secondary'}
           onClick={() => handleExportData('settlements', filterDate)}
           startIcon={<FileDownloadIcon />}
           sx={{ ml: 2 }}>
           Plik rozliczeniowy
         </Button>
         <Button
+          color={'secondary'}
           onClick={() => handleExportData('accounting', filterDate)}
           startIcon={<FileDownloadIcon />}
           sx={{ ml: 2 }}>

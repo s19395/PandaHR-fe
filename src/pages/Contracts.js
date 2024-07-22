@@ -424,7 +424,11 @@ const Contracts = () => {
         }}>
         <EmployeeSearch onEmployeeSelect={handleEmployeeSelect} sx={{ m: 2 }} />
         {employee && (
-          <Button variant="contained" onClick={() => table.setCreatingRow(true)} sx={{ m: 2 }}>
+          <Button
+            variant="contained"
+            color={'secondary'}
+            onClick={() => table.setCreatingRow(true)}
+            sx={{ m: 2 }}>
             Utwórz nową umowę
           </Button>
         )}

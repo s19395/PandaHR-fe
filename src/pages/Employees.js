@@ -283,7 +283,7 @@ export default function Employees() {
       </Box>
     ),
     renderTopToolbarCustomActions: () => (
-      <Button variant="contained" onClick={handleOpen} sx={{ m: 2 }}>
+      <Button variant="contained" color={'secondary'} onClick={handleOpen} sx={{ m: 2 }}>
         Stwórz pracownika
       </Button>
     ),

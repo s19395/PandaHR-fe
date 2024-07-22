@@ -251,7 +251,11 @@ export default function Position() {
       </Box>
     ),
     renderTopToolbarCustomActions: ({ table }) => (
-      <Button variant="contained" onClick={() => table.setCreatingRow(true)} sx={{ m: 2 }}>
+      <Button
+        variant="contained"
+        color={'secondary'}
+        onClick={() => table.setCreatingRow(true)}
+        sx={{ m: 2 }}>
         Stwórz stanowisko
       </Button>
     ),
