@@ -1,8 +1,6 @@
 import React from 'react';
 import { Typography, Grid, Paper, Box, Avatar } from '@mui/material';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import WorkingHours from '../../pages/WorkingHours';
 
 const Content = () => {
@@ -30,9 +28,7 @@ const Content = () => {
           </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-            <WorkingHours />
-          </LocalizationProvider>
+          <WorkingHours />
         </Grid>
       </Grid>
     </Paper>

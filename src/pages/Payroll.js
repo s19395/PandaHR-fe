@@ -5,8 +5,6 @@ import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import { Box, darken, IconButton, lighten, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import * as React from 'react';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
@@ -408,11 +406,7 @@ const Payroll = () => {
     }
   });
 
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-      <MaterialReactTable table={table} />
-    </LocalizationProvider>
-  );
+  return <MaterialReactTable table={table} />;
 };
 
 async function handleExportData(type, filterDate) {

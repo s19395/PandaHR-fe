@@ -22,8 +22,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import Typography from '@mui/material/Typography';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import EmployeeSearch from './EmployeeSearch';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -344,11 +342,7 @@ export default function Timesheet() {
     }
   });
 
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-      <MaterialReactTable table={table} />
-    </LocalizationProvider>
-  );
+  return <MaterialReactTable table={table} />;
 }
 
 // eslint-disable-next-line no-unused-vars

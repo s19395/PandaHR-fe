@@ -9,6 +9,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
 import App from './App';
 import AuthProvider from './helper/AuthProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,9 +18,11 @@ root.render(
     <DevSupport ComponentPreviews={ComponentPreviews} useInitialHook={useInitial}>
       <CssBaseline />
       <ThemeProvider theme={theme}>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </LocalizationProvider>
       </ThemeProvider>
     </DevSupport>
   </React.StrictMode>

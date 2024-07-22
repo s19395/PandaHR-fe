@@ -64,7 +64,7 @@ export default function LeftDrawer() {
           </List>
         </Box>
       </Drawer>
-      <CreateEmployee open={open} onClose={handleClose} />
+      <CreateEmployee open={open} onClose={handleClose} onEmployeeCreated={() => {}} />
     </>
   );
 }

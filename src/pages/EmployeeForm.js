@@ -23,12 +23,21 @@ import {
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { step0Schema, step1Schema } from './validationSchema';
 
 const steps = ['Pracownik', 'Dokumenty', 'Przegląd'];
 const initialFormValues = {
+  firstName: '',
+  lastName: '',
+  position: '',
+  hourlyRate: null,
+  bonus: null,
+  bonusThreshold: null,
+  street: '',
+  zipcode: '',
+  city: '',
   typeOfContract: 'Umowa Zlecenie',
   dateOfBirth: dayjs(),
   signedAt: dayjs(),
@@ -43,19 +52,31 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
   const [contracts, setContracts] = useState([]);
   const requestWithNotification = useRequestWithNotification();
 
+  const resolver = (step) => {
+    return yupResolver(step === 0 ? step0Schema : step1Schema);
+  };
+
   const {
     control,
     handleSubmit,
+    reset,
     setValue,
     watch,
-    formState: { errors }
+    formState: { errors },
+    trigger
   } = useForm({
-    defaultValues: initialFormValues
+    defaultValues: initialFormValues,
+    resolver: resolver(activeStep)
   });
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    // Re-run validation schema on step change
+    trigger();
+  }, [activeStep, trigger]);
 
   const fetchData = async () => {
     try {
@@ -70,8 +91,15 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
     }
   };
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  const handleNext = async () => {
+    const isValid = await trigger();
+    if (isValid) {
+      if (activeStep === steps.length - 1) {
+        handleSubmit(handleSubmitForm)();
+      } else {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1); // Move to next step
+      }
+    }
   };
 
   const handleBack = () => {
@@ -80,12 +108,7 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
 
   const handleReset = () => {
     setActiveStep(0);
-    setValue('typeOfContract', initialFormValues.typeOfContract);
-    setValue('signedAt', initialFormValues.signedAt);
-    setValue('dateOfBirth', initialFormValues.dateOfBirth);
-    setValue('validFrom', initialFormValues.validFrom);
-    setValue('validTo', initialFormValues.validTo);
-    setValue('bonusEnabled', initialFormValues.bonusEnabled);
+    reset(initialFormValues);
     onClose();
   };
 
@@ -133,449 +156,445 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-      <Dialog open={open} onClose={handleReset} maxWidth="md" fullWidth>
-        <DialogTitle>Nowy pracownik</DialogTitle>
-        <DialogContent>
-          <Stepper activeStep={activeStep} alternativeLabel>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-          <Box sx={{ mt: 2 }}>
-            {activeStep === 0 && (
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Controller
-                      name="firstName"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          label="Imię"
-                          fullWidth
-                          {...field}
-                          margin="normal"
-                          error={!!errors.firstName}
-                          helperText={errors.firstName?.message}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Controller
-                      name="lastName"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          label="Nazwisko"
-                          fullWidth
-                          {...field}
-                          margin="normal"
-                          error={!!errors.lastName}
-                          helperText={errors.lastName?.message}
-                        />
-                      )}
-                    />
-                  </Grid>
-                </Grid>
-                <Controller
-                  name="dateOfBirth"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      label="Data urodzenia"
-                      sx={{ mt: 2, mb: 2 }}
-                      {...field}
-                      onChange={(date) => setValue('dateOfBirth', date)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          fullWidth
-                          error={!!errors.dateOfBirth}
-                          helperText={errors.dateOfBirth?.message}
-                        />
-                      )}
-                    />
-                  )}
-                />
-                <Controller
-                  name="typeOfContract"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      label="Rodzaj umowy"
-                      fullWidth
-                      select
-                      {...field}
-                      margin="normal"
-                      error={!!errors.typeOfContract}
-                      helperText={errors.typeOfContract?.message}>
-                      {contracts.map((value) => (
-                        <MenuItem key={value} value={value}>
-                          {value}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
-                />
-                <Controller
-                  name="street"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      label="Ulica"
-                      fullWidth
-                      {...field}
-                      margin="normal"
-                      error={!!errors.street}
-                      helperText={errors.street?.message}
-                    />
-                  )}
-                />
-                <Grid container spacing={2}>
-                  <Grid item xs={4}>
-                    <Controller
-                      name="zipcode"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          label="Kod pocztowy"
-                          fullWidth
-                          {...field}
-                          margin="normal"
-                          error={!!errors.zipcode}
-                          helperText={errors.zipcode?.message}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Controller
-                      name="city"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          label="Miasto"
-                          fullWidth
-                          {...field}
-                          margin="normal"
-                          error={!!errors.city}
-                          helperText={errors.city?.message}
-                        />
-                      )}
-                    />
-                  </Grid>
-                </Grid>
-              </Box>
-            )}
-            {activeStep === 1 && (
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Controller
-                  name="position"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      label="Stanowisko"
-                      fullWidth
-                      select
-                      {...field}
-                      margin="normal"
-                      error={!!errors.position}
-                      helperText={errors.position?.message}>
-                      {positions.map((position) => (
-                        <MenuItem key={position.name} value={position.name}>
-                          {position.name}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
-                />
-                {(watch('position') || watch('typeOfContract') === 'Umowa zlecenie') && (
+    <Dialog open={open} onClose={handleReset} maxWidth="md" fullWidth>
+      <DialogTitle>Nowy pracownik</DialogTitle>
+      <DialogContent>
+        <Stepper activeStep={activeStep} alternativeLabel>
+          {steps.map((label) => (
+            <Step
+              key={label}
+              sx={{
+                '& .MuiStepLabel-root .Mui-completed': {
+                  color: 'secondary.dark'
+                },
+                '& .MuiStepLabel-root .Mui-active': {
+                  color: 'secondary.main'
+                }
+              }}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+        <Box sx={{ mt: 2 }}>
+          {activeStep === 0 && (
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
                   <Controller
-                    name="hourlyRate"
+                    name="firstName"
                     control={control}
                     render={({ field }) => (
                       <TextField
-                        label="Stawka godzinowa"
-                        type="number"
+                        label="Imię"
                         fullWidth
-                        InputProps={{
-                          startAdornment: <InputAdornment position="start">PLN</InputAdornment>
-                        }}
                         {...field}
                         margin="normal"
-                        error={!!errors.hourlyRate}
-                        helperText={errors.hourlyRate?.message}
+                        error={!!errors.firstName}
+                        helperText={errors.firstName?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Controller
+                    name="lastName"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label="Nazwisko"
+                        fullWidth
+                        {...field}
+                        margin="normal"
+                        error={!!errors.lastName}
+                        helperText={errors.lastName?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+              </Grid>
+              <Controller
+                name="dateOfBirth"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    label="Data urodzenia"
+                    sx={{ mt: 2, mb: 2 }}
+                    {...field}
+                    onChange={(date) => setValue('dateOfBirth', date)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        error={!!errors.dateOfBirth}
+                        helperText={errors.dateOfBirth?.message}
                       />
                     )}
                   />
                 )}
-                {(watch('typeOfContract') === 'Umowa o pracę' || watch('position')) && (
-                  <>
-                    <Controller
-                      name="signedAt"
-                      control={control}
-                      render={({ field }) => (
-                        <DatePicker
-                          label="Podpisano w dniu"
-                          sx={{ mt: 2, mb: 2 }}
-                          {...field}
-                          onChange={(date) => setValue('signedAt', date)}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              fullWidth
-                              error={!!errors.signedAt}
-                              helperText={errors.signedAt?.message}
+              />
+              <Controller
+                name="typeOfContract"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    label="Rodzaj umowy"
+                    fullWidth
+                    select
+                    {...field}
+                    margin="normal"
+                    error={!!errors.typeOfContract}
+                    helperText={errors.typeOfContract?.message}>
+                    {contracts.map((value) => (
+                      <MenuItem key={value} value={value}>
+                        {value}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              />
+              <Controller
+                name="street"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    label="Ulica"
+                    fullWidth
+                    {...field}
+                    margin="normal"
+                    error={!!errors.street}
+                    helperText={errors.street?.message}
+                  />
+                )}
+              />
+              <Grid container spacing={2}>
+                <Grid item xs={4}>
+                  <Controller
+                    name="zipcode"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label="Kod pocztowy"
+                        fullWidth
+                        {...field}
+                        margin="normal"
+                        error={!!errors.zipcode}
+                        helperText={errors.zipcode?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={8}>
+                  <Controller
+                    name="city"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        label="Miasto"
+                        fullWidth
+                        {...field}
+                        margin="normal"
+                        error={!!errors.city}
+                        helperText={errors.city?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+          {activeStep === 1 && (
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Controller
+                name="position"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    label="Stanowisko"
+                    fullWidth
+                    select
+                    {...field}
+                    margin="normal"
+                    error={!!errors.position}
+                    helperText={errors.position?.message}>
+                    {positions.map((position) => (
+                      <MenuItem key={position.name} value={position.name}>
+                        {position.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              />
+              {(watch('position') || watch('typeOfContract') === 'Umowa zlecenie') && (
+                <Controller
+                  name="hourlyRate"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      label="Stawka godzinowa"
+                      type="number"
+                      fullWidth
+                      InputProps={{
+                        startAdornment: <InputAdornment position="start">PLN</InputAdornment>
+                      }}
+                      {...field}
+                      margin="normal"
+                      error={!!errors.hourlyRate}
+                      helperText={errors.hourlyRate?.message}
+                    />
+                  )}
+                />
+              )}
+              {(watch('typeOfContract') === 'Umowa o pracę' || watch('position')) && (
+                <>
+                  <Controller
+                    name="signedAt"
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        label="Podpisano w dniu"
+                        sx={{ mt: 2, mb: 2 }}
+                        {...field}
+                        onChange={(date) => setValue('signedAt', date)}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            fullWidth
+                            error={!!errors.signedAt}
+                            helperText={errors.signedAt?.message}
+                          />
+                        )}
+                      />
+                    )}
+                  />
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <Controller
+                          name="validFrom"
+                          control={control}
+                          render={({ field }) => (
+                            <DatePicker
+                              label="Data rozpoczęcia"
+                              sx={{ mt: 2, mb: 2 }}
+                              {...field}
+                              onChange={(date) => setValue('validFrom', date)}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  fullWidth
+                                  error={!!errors.validFrom}
+                                  helperText={errors.validFrom?.message}
+                                />
+                              )}
                             />
                           )}
                         />
-                      )}
-                    />
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                          <Controller
-                            name="validFrom"
-                            control={control}
-                            render={({ field }) => (
-                              <DatePicker
-                                label="Data rozpoczęcia"
-                                sx={{ mt: 2, mb: 2 }}
-                                {...field}
-                                onChange={(date) => setValue('validFrom', date)}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    fullWidth
-                                    error={!!errors.validFrom}
-                                    helperText={errors.validFrom?.message}
-                                  />
-                                )}
-                              />
-                            )}
-                          />
-                        </Box>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                          <Controller
-                            name="validTo"
-                            control={control}
-                            render={({ field }) => (
-                              <DatePicker
-                                label="Data zakończenia"
-                                sx={{ mt: 2, mb: 2 }}
-                                {...field}
-                                onChange={(date) => setValue('validTo', date)}
-                                renderInput={(params) => (
-                                  <TextField
-                                    {...params}
-                                    fullWidth
-                                    error={!!errors.validTo}
-                                    helperText={errors.validTo?.message}
-                                  />
-                                )}
-                              />
-                            )}
-                          />
-                        </Box>
-                      </Grid>
+                      </Box>
                     </Grid>
-                    <Controller
-                      name="bonusEnabled"
-                      control={control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          control={<Checkbox {...field} checked={field.value} />}
-                          label="Premia"
+                    <Grid item xs={6}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <Controller
+                          name="validTo"
+                          control={control}
+                          render={({ field }) => (
+                            <DatePicker
+                              label="Data zakończenia"
+                              sx={{ mt: 2, mb: 2 }}
+                              {...field}
+                              onChange={(date) => setValue('validTo', date)}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  fullWidth
+                                  error={!!errors.validTo}
+                                  helperText={errors.validTo?.message}
+                                />
+                              )}
+                            />
+                          )}
                         />
-                      )}
-                    />
-                    {watch('bonusEnabled') && (
+                      </Box>
+                    </Grid>
+                  </Grid>
+                  <Controller
+                    name="bonusEnabled"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        control={<Checkbox {...field} checked={field.value} />}
+                        label="Premia"
+                      />
+                    )}
+                  />
+                  {watch('bonusEnabled') && (
+                    <>
+                      <Controller
+                        name="bonus"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            label="Kwota premii"
+                            type="number"
+                            fullWidth
+                            InputProps={{
+                              startAdornment: <InputAdornment position="start">PLN</InputAdornment>
+                            }}
+                            {...field}
+                            margin="normal"
+                            error={!!errors.bonus}
+                            helperText={errors.bonus?.message}
+                          />
+                        )}
+                      />
+                      <Controller
+                        name="bonusThreshold"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            label="Próg premii"
+                            type="number"
+                            fullWidth
+                            InputProps={{
+                              startAdornment: <InputAdornment position="start">PLN</InputAdornment>
+                            }}
+                            {...field}
+                            margin="normal"
+                            error={!!errors.bonusThreshold}
+                            helperText={errors.bonusThreshold?.message}
+                          />
+                        )}
+                      />
+                    </>
+                  )}
+                </>
+              )}
+            </Box>
+          )}
+          {activeStep === 2 && (
+            <Card>
+              <CardContent>
+                <Divider sx={{ ml: 2, mr: 2 }} />
+                <Box mt={2}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <DetailItem title="Imię" content={watch('firstName')} />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <DetailItem title="Nazwisko" content={watch('lastName')} />
+                    </Grid>
+                    {watch('dateOfBirth') && (
                       <>
-                        <Controller
-                          name="bonus"
-                          control={control}
-                          render={({ field }) => (
-                            <TextField
-                              label="Kwota premii"
-                              type="number"
-                              fullWidth
-                              InputProps={{
-                                startAdornment: (
-                                  <InputAdornment position="start">PLN</InputAdornment>
-                                )
-                              }}
-                              {...field}
-                              margin="normal"
-                              error={!!errors.bonus}
-                              helperText={errors.bonus?.message}
-                            />
-                          )}
-                        />
-                        <Controller
-                          name="bonusThreshold"
-                          control={control}
-                          render={({ field }) => (
-                            <TextField
-                              label="Próg premii"
-                              type="number"
-                              fullWidth
-                              InputProps={{
-                                startAdornment: (
-                                  <InputAdornment position="start">PLN</InputAdornment>
-                                )
-                              }}
-                              {...field}
-                              margin="normal"
-                              error={!!errors.bonusThreshold}
-                              helperText={errors.bonusThreshold?.message}
-                            />
-                          )}
-                        />
+                        <Grid item xs={12}>
+                          <DetailItem
+                            title="Data urodzenia"
+                            content={dayjs(watch('dateOfBirth')).format('DD.MM.YYYY')}
+                          />
+                        </Grid>
                       </>
                     )}
-                  </>
-                )}
-              </Box>
-            )}
-            {activeStep === 2 && (
-              <Card>
-                <CardContent>
-                  <Divider sx={{ ml: 2, mr: 2 }} />
-                  <Box mt={2}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <DetailItem title="Imię" content={watch('firstName')} />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <DetailItem title="Nazwisko" content={watch('lastName')} />
-                      </Grid>
-                      {watch('dateOfBirth') && (
-                        <>
-                          <Grid item xs={12}>
-                            <DetailItem
-                              title="Data urodzenia"
-                              content={dayjs(watch('dateOfBirth')).format('DD.MM.YYYY')}
-                            />
-                          </Grid>
-                        </>
-                      )}
-                      {watch('typeOfContract') && (
-                        <>
-                          <Grid item xs={12}>
-                            <DetailItem title="Rodzaj umowy" content={watch('typeOfContract')} />
-                          </Grid>
-                        </>
-                      )}
-                      {(watch('zipcode') || watch('city') || watch('street')) && (
-                        <>
-                          <Grid item xs={12}>
-                            <DetailItem
-                              title="Adres"
-                              content={`
+                    {watch('typeOfContract') && (
+                      <>
+                        <Grid item xs={12}>
+                          <DetailItem title="Rodzaj umowy" content={watch('typeOfContract')} />
+                        </Grid>
+                      </>
+                    )}
+                    {(watch('zipcode') || watch('city') || watch('street')) && (
+                      <>
+                        <Grid item xs={12}>
+                          <DetailItem
+                            title="Adres"
+                            content={`
                               ${watch('zipcode') ? watch('zipcode') + ' ' : ''}
                               ${watch('city') ? watch('city') + ', ' : ''}
                               ${watch('street') ? watch('street') : ''}
                             `}
-                            />
-                          </Grid>
-                        </>
-                      )}
-                      <Grid item xs={12}>
-                        <Divider variant="middle" />
-                      </Grid>
-                      {watch('position') && (
-                        <>
-                          <Grid item xs={12} sm={6}>
-                            <DetailItem title="Stanowisko" content={watch('position')} />
-                          </Grid>
-                          {watch('signedAt') && (
-                            <>
-                              <Grid item xs={12} sm={6}>
-                                <DetailItem
-                                  title="Podpisano dnia"
-                                  content={dayjs(watch('signedAt')).format('DD.MM.YYYY')}
-                                />
-                              </Grid>
-                            </>
-                          )}
-                          {watch('validFrom') && (
-                            <>
-                              <Grid item xs={12} sm={6}>
-                                <DetailItem
-                                  title="Data od"
-                                  content={dayjs(watch('validFrom')).format('DD.MM.YYYY')}
-                                />
-                              </Grid>
-                            </>
-                          )}
-                          {watch('validTo') && (
-                            <>
-                              <Grid item xs={12} sm={6}>
-                                <DetailItem
-                                  title="Data do"
-                                  content={dayjs(watch('validTo')).format('DD.MM.YYYY')}
-                                />
-                              </Grid>
-                            </>
-                          )}
-                          <Grid item xs={12} sm={6}>
-                            <DetailItem
-                              title="Premia"
-                              content={watch('bonusEnabled') ? 'Tak' : 'Nie'}
-                            />
-                          </Grid>
-                          {watch('bonusEnabled') && (
-                            <>
-                              <Grid item xs={12}>
-                                <Divider variant="middle" />
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <DetailItem
-                                  title="Stawka godzinowa"
-                                  content={watch('hourlyRate')}
-                                />
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <DetailItem title="Premia" content={watch('bonus')} />
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <DetailItem
-                                  title="Liczba dni weekendowych do premii"
-                                  content={watch('bonusThreshold')}
-                                />
-                              </Grid>
-                            </>
-                          )}
-                        </>
-                      )}
+                          />
+                        </Grid>
+                      </>
+                    )}
+                    <Grid item xs={12}>
+                      <Divider variant="middle" />
                     </Grid>
-                  </Box>
-                </CardContent>
-              </Card>
-            )}
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          {activeStep > 0 && <Button onClick={handleBack}>Wstecz</Button>}
-          {activeStep < steps.length - 1 ? (
-            <Button onClick={handleNext} color="secondary" variant="contained">
-              Dalej
-            </Button>
-          ) : (
-            <Button onClick={handleSubmit(handleSubmitForm)} color="secondary" variant="contained">
-              Zapisz
-            </Button>
+                    {watch('position') && (
+                      <>
+                        <Grid item xs={12} sm={6}>
+                          <DetailItem title="Stanowisko" content={watch('position')} />
+                        </Grid>
+                        {watch('signedAt') && (
+                          <>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem
+                                title="Podpisano dnia"
+                                content={dayjs(watch('signedAt')).format('DD.MM.YYYY')}
+                              />
+                            </Grid>
+                          </>
+                        )}
+                        {watch('validFrom') && (
+                          <>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem
+                                title="Data od"
+                                content={dayjs(watch('validFrom')).format('DD.MM.YYYY')}
+                              />
+                            </Grid>
+                          </>
+                        )}
+                        {watch('validTo') && (
+                          <>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem
+                                title="Data do"
+                                content={dayjs(watch('validTo')).format('DD.MM.YYYY')}
+                              />
+                            </Grid>
+                          </>
+                        )}
+                        <Grid item xs={12} sm={6}>
+                          <DetailItem
+                            title="Premia"
+                            content={watch('bonusEnabled') ? 'Tak' : 'Nie'}
+                          />
+                        </Grid>
+                        {watch('bonusEnabled') && (
+                          <>
+                            <Grid item xs={12}>
+                              <Divider variant="middle" />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem title="Stawka godzinowa" content={watch('hourlyRate')} />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem title="Premia" content={watch('bonus')} />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <DetailItem
+                                title="Liczba dni weekendowych do premii"
+                                content={watch('bonusThreshold')}
+                              />
+                            </Grid>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </Grid>
+                </Box>
+              </CardContent>
+            </Card>
           )}
-          <Button onClick={handleReset}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
-    </LocalizationProvider>
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ mr: 2 }}>
+        <Button onClick={handleReset}>Anuluj</Button>
+        <Button onClick={handleBack} disabled={activeStep === 0}>
+          Wstecz
+        </Button>
+        <Button onClick={handleNext} color="secondary" variant="contained">
+          {activeStep === steps.length - 1 ? 'Zapisz' : 'Dalej'}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

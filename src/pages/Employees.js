@@ -18,8 +18,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import { DatePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
 import CreateEmployee from './EmployeeForm';
 
@@ -307,9 +305,7 @@ export default function Employees() {
   return (
     <>
       <CreateEmployee open={open} onClose={handleClose} onEmployeeCreated={handleCreateEmployee} />
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-        <MaterialReactTable table={table} />
-      </LocalizationProvider>
+      <MaterialReactTable table={table} />
     </>
   );
 }

@@ -10,8 +10,6 @@ import moment from 'moment';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import { CustomNumeric, CustomCheckbox } from './CustomFields';
 import Checkbox from '@mui/material/Checkbox';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/pl';
 import DescriptionIcon from '@mui/icons-material/Description';
 import axios from 'axios';
@@ -24,7 +22,6 @@ const Contracts = () => {
   const [positions, setPositions] = useState([]);
   const [contracts, setContracts] = useState([]);
   const [creatingRowIndex, setCreatingRowIndex] = useState();
-  // eslint-disable-next-line no-unused-vars
   const [validationErrors, setValidationErrors] = useState({});
   const [isLoadingContracts, setIsLoadingContracts] = useState(true);
   const [isLoadingContractsError, setIsLoadingContractsError] = useState(false);
@@ -493,11 +490,7 @@ const Contracts = () => {
     }
   });
 
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-      <MaterialReactTable table={table} />
-    </LocalizationProvider>
-  );
+  return <MaterialReactTable table={table} />;
 };
 
 // const validateRequired = (value) => !!value.length;
