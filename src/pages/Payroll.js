@@ -133,6 +133,9 @@ const Payroll = () => {
         header: 'Liczba godzin',
         enableEditing: false,
         Cell: ({ cell, row }) => {
+          if (!cell.getValue()) {
+            return '';
+          }
           const workedHours = cell.getValue();
           const employmentContract = row.original.employmentContract;
 

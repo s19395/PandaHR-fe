@@ -17,10 +17,10 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon } from '@mui/icons-material';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
-import moment from 'moment';
 import PositionDuty from './PositionDuty';
 import List from '@mui/material/List';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
+import dayjs from 'dayjs';
 
 export default function Position() {
   const [validationErrors, setValidationErrors] = useState({});
@@ -67,7 +67,7 @@ export default function Position() {
         accessorKey: 'createdAt',
         header: 'Utworzony',
         enableEditing: false,
-        Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD.MM.YYYY')}</span>
+        Cell: ({ cell }) => <span>{dayjs(cell.getValue()).format('DD.MM.YYYY')}</span>
       },
       {
         accessorKey: 'status',

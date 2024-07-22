@@ -6,7 +6,6 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../helper/AxiosHelper';
-import moment from 'moment';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import { CustomNumeric, CustomCheckbox } from './CustomFields';
 import Checkbox from '@mui/material/Checkbox';
@@ -198,9 +197,9 @@ const Contracts = () => {
       id: values.id,
       parentContractId: values.parentContractId,
       name: values.name,
-      signedAt: moment(values.signedAt).format('YYYY-MM-DD'),
-      validFrom: moment(values.validFrom).format('YYYY-MM-DD'),
-      validTo: values.validTo ? moment(values.validTo).format('YYYY-MM-DD') : null,
+      signedAt: dayjs(values.signedAt).format('YYYY-MM-DD'),
+      validFrom: dayjs(values.validFrom).format('YYYY-MM-DD'),
+      validTo: values.validTo ? dayjs(values.validTo).format('YYYY-MM-DD') : null,
       earningConditionsDto: earningConditionsDto,
       positionDto: positionDto,
       subRows: values.subRows
