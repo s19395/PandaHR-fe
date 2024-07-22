@@ -33,8 +33,7 @@ const WorkingHours = () => {
   const monthNames = dayjs.months();
 
   return (
-    <Paper
-      sx={{ p: 3, bgcolor: '#ffffff', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Paper sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Typography variant="h5" gutterBottom>
         Wymiar czasu pracy
       </Typography>

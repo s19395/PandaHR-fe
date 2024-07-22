@@ -42,7 +42,6 @@ const Contracts = () => {
       if (!employee) {
         setContracts([]);
       } else {
-        console.log(employee);
         const contractsData = await requestWithNotification(
           'get',
           `/contracts/employee/${employee.id}`
