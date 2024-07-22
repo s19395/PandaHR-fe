@@ -259,7 +259,7 @@ const Contracts = () => {
           </span>
         ),
         Edit: ({ column, row }) => {
-          return employee?.employmentContract === 'Umowa Zlecenie' ? (
+          return employee?.employmentContract === 'Umowa Zlecenie' && row.depth === 0 ? (
             <DatePicker
               label="Data do"
               defaultValue={dayjs(row._valuesCache.validTo)}
@@ -363,7 +363,7 @@ const Contracts = () => {
     },
     displayColumnDefOptions: {
       'mrt-row-actions': {
-        size: 140
+        size: 180
       },
       'mrt-row-expand': {
         size: 50
