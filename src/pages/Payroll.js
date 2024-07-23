@@ -14,7 +14,7 @@ import axios from 'axios';
 import AddIcon from '@mui/icons-material/Add';
 
 const Payroll = () => {
-  const [filterDate, setFilterDate] = useState(dayjs());
+  const [filterDate, setFilterDate] = useState(dayjs().subtract(1, 'month'));
   const [payroll, setPayroll] = useState([]);
   const [creatingRowIndex, setCreatingRowIndex] = useState();
   const [isLoadingPayroll, setIsLoadingPayroll] = useState(true);
