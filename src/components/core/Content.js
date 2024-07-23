@@ -13,11 +13,17 @@ const Content = () => {
               color={'primary'}
               sx={{ mb: 2, fontSize: 55, transform: 'scaleX(-1)' }}
             />
-            <Typography variant="h3" gutterBottom sx={{ mt: 2 }}>
-              <Typography color={'primary'} variant="h3" gutterBottom sx={{ mt: 2 }}>
-                <span style={{ color: '#cdcbc9' }}>Panda</span>
-                <span style={{ color: 'primary', fontWeight: 'bold' }}>HR</span>
-              </Typography>
+            <Typography inline variant="h3" gutterBottom sx={{ mt: 2 }}>
+              Panda
+            </Typography>
+            <Typography
+              inline
+              color={'primary'}
+              fontWeight={'bold'}
+              variant="h3"
+              gutterBottom
+              sx={{ mt: 2 }}>
+              HR
             </Typography>
           </Box>
         </Grid>
