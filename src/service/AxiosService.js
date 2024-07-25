@@ -1,13 +1,9 @@
 import axios from 'axios';
-import { useAlert } from './AlertProvider';
+import { useAlert } from './AlertService';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.baseURL = process.env.REACT_APP_ENDPOINT;
 
-/**
- * Custom hook for making HTTP requests with notifications.
- * This hook uses the useAlert hook to display notifications based on the result of the HTTP request.
- */
 export const useRequestWithNotification = () => {
   const { setAlert } = useAlert();
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
-import { useAlert } from '../../helper/AlertProvider';
+import { useAlert } from '../../service/AlertService';
 
 const AlertSnackbar = () => {
   const { alert, handleClose } = useAlert();

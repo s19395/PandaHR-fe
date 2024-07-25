@@ -16,7 +16,7 @@ import {
   ListItem
 } from '@mui/material';
 import { Edit as EditIcon } from '@mui/icons-material';
-import { useRequestWithNotification } from '../helper/AxiosHelper';
+import { useRequestWithNotification } from '../service/AxiosService';
 import PositionDuty from './PositionDuty';
 import List from '@mui/material/List';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';

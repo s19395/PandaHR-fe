@@ -8,7 +8,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
 import App from './App';
-import AuthProvider from './helper/AuthProvider';
+import AuthService from './service/AuthService';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
@@ -19,9 +19,9 @@ root.render(
       <CssBaseline />
       <ThemeProvider theme={theme}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-          <AuthProvider>
+          <AuthService>
             <App />
-          </AuthProvider>
+          </AuthService>
         </LocalizationProvider>
       </ThemeProvider>
     </DevSupport>

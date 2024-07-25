@@ -1,4 +1,4 @@
-import { useAuth } from '../helper/AuthProvider';
+import { useAuth } from '../service/AuthService';
 import { Container } from '@mui/material';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -9,7 +9,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import * as React from 'react';
-import { useRequestWithNotification } from '../helper/AxiosHelper';
+import { useRequestWithNotification } from '../service/AxiosService';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
