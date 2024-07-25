@@ -1,4 +1,5 @@
-import React, { createContext, useState, useCallback, useContext } from 'react';
+import React, { createContext, useState, useCallback, useContext, useMemo } from 'react';
+import PropTypes from 'prop-types';
 
 const AlertContext = createContext();
 
@@ -12,11 +13,13 @@ const AlertProvider = ({ children }) => {
     setAlert((prev) => ({ ...prev, open: false }));
   }, []);
 
-  return (
-    <AlertContext.Provider value={{ alert, setAlert, handleClose }}>
-      {children}
-    </AlertContext.Provider>
-  );
+  const value = useMemo(() => ({ alert, setAlert, handleClose }), [alert, setAlert, handleClose]);
+
+  return <AlertContext.Provider value={value}>{children}</AlertContext.Provider>;
+};
+
+AlertProvider.propTypes = {
+  children: PropTypes.node.isRequired
 };
 
 export const useAlert = () => {

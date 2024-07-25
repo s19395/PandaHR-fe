@@ -203,16 +203,14 @@ const Payroll = () => {
         header: 'Do wypłaty - weekendy',
         enableEditing: false,
         Cell: ({ cell }) => (
-          <>
-            <Box sx={{ color: 'success.main', fontWeight: 'bold' }}>
-              {cell.getValue()?.toLocaleString?.('pl-PL', {
-                style: 'currency',
-                currency: 'PLN',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-              })}
-            </Box>
-          </>
+          <Box sx={{ color: 'success.main', fontWeight: 'bold' }}>
+            {cell.getValue()?.toLocaleString?.('pl-PL', {
+              style: 'currency',
+              currency: 'PLN',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })}
+          </Box>
         )
       },
       {
@@ -234,32 +232,26 @@ const Payroll = () => {
         header: 'Premia razem',
         enableEditing: false,
         Cell: ({ cell }) => (
-          <>
-            <Box sx={{ color: 'success.main', fontWeight: 'bold' }}>
-              {cell.getValue()?.toLocaleString?.('pl-PL', {
-                style: 'currency',
-                currency: 'PLN',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-              })}
-            </Box>
-          </>
+          <Box sx={{ color: 'success.main', fontWeight: 'bold' }}>
+            {cell.getValue()?.toLocaleString?.('pl-PL', {
+              style: 'currency',
+              currency: 'PLN',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })}
+          </Box>
         )
       },
       {
         accessorKey: 'comment',
         header: 'Komentarz',
         Cell: ({ cell }) => (
-          <>
-            <Tooltip
-              title={
-                <div style={{ whiteSpace: 'pre-line' }}>
-                  {cell.getValue()?.split(';').join('\n')}
-                </div>
-              }>
-              <span>{cell.getValue()}</span>
-            </Tooltip>
-          </>
+          <Tooltip
+            title={
+              <div style={{ whiteSpace: 'pre-line' }}>{cell.getValue()?.split(';').join('\n')}</div>
+            }>
+            <span>{cell.getValue()}</span>
+          </Tooltip>
         )
       },
       {
@@ -354,24 +346,17 @@ const Payroll = () => {
           </>
         )}
         {row.depth === 0 && (
-          <>
-            <Tooltip title="Dodaj premię">
-              <IconButton
-                onClick={() => {
-                  setCreatingRowIndex((staticRowIndex || 0) + 1);
-                  table.setCreatingRow(
-                    createRow(
-                      table,
-                      { id: row.original.employeeId, subRows: [] },
-                      -1,
-                      row.depth + 1
-                    )
-                  );
-                }}>
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          </>
+          <Tooltip title="Dodaj premię">
+            <IconButton
+              onClick={() => {
+                setCreatingRowIndex((staticRowIndex || 0) + 1);
+                table.setCreatingRow(
+                  createRow(table, { id: row.original.employeeId, subRows: [] }, -1, row.depth + 1)
+                );
+              }}>
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
         )}
       </Box>
     ),
