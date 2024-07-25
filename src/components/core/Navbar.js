@@ -3,9 +3,9 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { useAuth } from '../../helper/AuthProvider';
+import { useAuth } from '../../service/AuthService';
 import { useNavigate } from 'react-router-dom';
-import { useAlert } from '../../helper/AlertProvider';
+import { useAlert } from '../../service/AlertService';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 
 export default function Navbar() {

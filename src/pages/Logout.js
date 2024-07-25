@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../helper/AuthProvider';
+import { useAuth } from '../service/AuthService';
 import Button from '@mui/material/Button';
 
 const Logout = () => {

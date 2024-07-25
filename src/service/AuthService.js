@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 const AuthContext = createContext();
 
-const AuthProvider = ({ children }) => {
+const AuthService = ({ children }) => {
   // State to hold the authentication token
   const [token, setToken_] = useState(localStorage.getItem('token'));
 
@@ -39,4 +39,4 @@ export const useAuth = () => {
   return useContext(AuthContext);
 };
 
-export default AuthProvider;
+export default AuthService;

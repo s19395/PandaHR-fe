@@ -5,7 +5,7 @@ import { Box, Button, IconButton, Tooltip, darken, lighten } from '@mui/material
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useRequestWithNotification } from '../helper/AxiosHelper';
+import { useRequestWithNotification } from '../service/AxiosService';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import { CustomNumeric, CustomCheckbox } from './CustomFields';
 import Checkbox from '@mui/material/Checkbox';

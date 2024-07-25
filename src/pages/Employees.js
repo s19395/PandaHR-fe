@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useRequestWithNotification } from '../helper/AxiosHelper';
+import { useRequestWithNotification } from '../service/AxiosService';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';

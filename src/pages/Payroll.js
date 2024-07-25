@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useRequestWithNotification } from '../helper/AxiosHelper';
+import { useRequestWithNotification } from '../service/AxiosService';
 import { createRow, MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import { Box, darken, IconButton, lighten, Tooltip } from '@mui/material';

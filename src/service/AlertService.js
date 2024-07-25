@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const AlertContext = createContext();
 
-const AlertProvider = ({ children }) => {
+const AlertService = ({ children }) => {
   const [alert, setAlert] = useState({ open: false, severity: 'success', message: '' });
 
   const handleClose = useCallback((event, reason) => {
@@ -18,7 +18,7 @@ const AlertProvider = ({ children }) => {
   return <AlertContext.Provider value={value}>{children}</AlertContext.Provider>;
 };
 
-AlertProvider.propTypes = {
+AlertService.propTypes = {
   children: PropTypes.node.isRequired
 };
 
@@ -26,4 +26,4 @@ export const useAlert = () => {
   return useContext(AlertContext);
 };
 
-export default AlertProvider;
+export default AlertService;
