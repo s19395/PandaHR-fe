@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../helper/AuthProvider';
+import { useAuth } from '../service/AuthService';
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Navbar from '../components/core/Navbar';

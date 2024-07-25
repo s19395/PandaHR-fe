@@ -5,7 +5,7 @@ import { Box, Button, IconButton, Tooltip, darken, lighten } from '@mui/material
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useRequestWithNotification } from '../helper/AxiosHelper';
+import { useRequestWithNotification } from '../service/AxiosService';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
 import { CustomNumeric, CustomCheckbox } from './CustomFields';
 import Checkbox from '@mui/material/Checkbox';
@@ -78,7 +78,6 @@ const Contracts = () => {
         employeeId: employee.id
       });
 
-      // Optimistically update the state
       setContracts((prevContracts) => {
         const newContracts = JSON.parse(JSON.stringify(prevContracts)); // deep copy
         newContract.subRows = [];
@@ -95,11 +94,9 @@ const Contracts = () => {
         return newContracts;
       });
 
-      // Exit creating mode
       table.setCreatingRow(null);
     } catch (error) {
       console.error('Error creating contract:', error);
-      // Handle error accordingly
     } finally {
       setIsSaving(false);
     }
@@ -200,6 +197,9 @@ const Contracts = () => {
       signedAt: dayjs(values.signedAt).format('YYYY-MM-DD'),
       validFrom: dayjs(values.validFrom).format('YYYY-MM-DD'),
       validTo: values.validTo ? dayjs(values.validTo).format('YYYY-MM-DD') : null,
+      terminationDate: values.terminationDate
+        ? dayjs(values.terminationDate).format('YYYY-MM-DD')
+        : null,
       earningConditionsDto: earningConditionsDto,
       positionDto: positionDto,
       subRows: values.subRows
@@ -303,6 +303,35 @@ const Contracts = () => {
               }}
             />
           );
+        }
+      },
+      {
+        accessorKey: 'terminationDate',
+        id: 'terminationDate',
+        header: 'Data zakończenia',
+        Cell: ({ row }) => (
+          <span>
+            {row.original.terminationDate
+              ? dayjs(row.original.terminationDate).format('DD.MM.YYYY').toString()
+              : ''}
+          </span>
+        ),
+        Edit: ({ column, row }) => {
+          return row.depth === 0 ? (
+            <DatePicker
+              label="Data zakończenia"
+              defaultValue={dayjs(row._valuesCache.terminationDate)}
+              onChange={(newValue) => (row._valuesCache[column.id] = newValue)}
+              sx={{ mb: 2 }}
+              slotProps={{
+                textField: {
+                  variant: 'standard',
+                  error: !!validationErrors?.validTo,
+                  helperText: validationErrors?.validTo
+                }
+              }}
+            />
+          ) : null;
         }
       },
       {
@@ -419,11 +448,13 @@ const Contracts = () => {
     positionCreatingRow: creatingRowIndex,
     renderRowActions: ({ row, staticRowIndex, table }) => (
       <Box sx={{ display: 'flex' }}>
-        <Tooltip title="Wygeneruj dokument">
-          <IconButton onClick={() => generateDocument(row.original)}>
-            <DescriptionIcon />
-          </IconButton>
-        </Tooltip>
+        {employee?.employmentContract === 'Umowa Zlecenie' && (
+          <Tooltip title="Wygeneruj dokument">
+            <IconButton onClick={() => generateDocument(row.original)}>
+              <DescriptionIcon />
+            </IconButton>
+          </Tooltip>
+        )}
         <Tooltip title="Edytuj">
           <IconButton onClick={() => table.setEditingRow(row)}>
             <EditIcon />

@@ -5,7 +5,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import 'dayjs/locale/pl';
 import TextField from '@mui/material/TextField';
 import FileUpload from '../components/common/FileUpload';
-import { useRequestWithNotification } from '../helper/AxiosHelper';
+import { useRequestWithNotification } from '../service/AxiosService';
 
 const localeData = require('dayjs/plugin/localeData');
 dayjs.locale('pl');
