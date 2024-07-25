@@ -448,11 +448,13 @@ const Contracts = () => {
     positionCreatingRow: creatingRowIndex,
     renderRowActions: ({ row, staticRowIndex, table }) => (
       <Box sx={{ display: 'flex' }}>
-        <Tooltip title="Wygeneruj dokument">
-          <IconButton onClick={() => generateDocument(row.original)}>
-            <DescriptionIcon />
-          </IconButton>
-        </Tooltip>
+        {employee?.employmentContract === 'Umowa Zlecenie' && (
+          <Tooltip title="Wygeneruj dokument">
+            <IconButton onClick={() => generateDocument(row.original)}>
+              <DescriptionIcon />
+            </IconButton>
+          </Tooltip>
+        )}
         <Tooltip title="Edytuj">
           <IconButton onClick={() => table.setEditingRow(row)}>
             <EditIcon />
