@@ -1,4 +1,4 @@
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom';
 import { useAuth } from '../service/AuthService';
 import { ProtectedRoute } from './ProtectedRoute';
 import Logout from '../pages/Logout';
@@ -70,7 +70,11 @@ const Routes = () => {
   // Combine and conditionally include routes based on authentication status
   const router = createBrowserRouter([
     ...(!token ? routesForNotAuthenticatedOnly : []),
-    ...routesForAuthenticatedOnly
+    ...routesForAuthenticatedOnly,
+    {
+      path: '*',
+      element: <Navigate to="/" />
+    }
   ]);
 
   // Provide the router configuration using RouterProvider
