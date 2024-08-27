@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRequestWithNotification } from '../service/AxiosService';
 import { createRow, MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
-import { Box, darken, IconButton, lighten, Tooltip } from '@mui/material';
+import { Box, darken, IconButton, lighten, TextField, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
@@ -14,6 +14,7 @@ import axios from 'axios';
 import AddIcon from '@mui/icons-material/Add';
 
 const Payroll = () => {
+  const [validationErrors, setValidationErrors] = useState({});
   const [filterDate, setFilterDate] = useState(dayjs().subtract(1, 'month'));
   const [payroll, setPayroll] = useState([]);
   const [creatingRowIndex, setCreatingRowIndex] = useState();
@@ -45,6 +46,12 @@ const Payroll = () => {
   }, [filterDate]);
 
   const handleCreateBonus = async ({ values, row, table }) => {
+    const newValidationErrors = validateBonus(values);
+    if (Object.values(newValidationErrors).some((error) => error)) {
+      setValidationErrors(newValidationErrors);
+      return;
+    }
+    setValidationErrors({});
     setIsSaving(true);
     try {
       await requestWithNotification('post', '/payroll/bonus', {
@@ -64,6 +71,12 @@ const Payroll = () => {
   };
 
   const handleSaveBonus = async ({ values, table, row }) => {
+    const newValidationErrors = validateBonus(values);
+    if (Object.values(newValidationErrors).some((error) => error)) {
+      setValidationErrors(newValidationErrors);
+      return;
+    }
+    setValidationErrors({});
     setIsSaving(true);
     try {
       await requestWithNotification('put', `/payroll/bonus`, {
@@ -225,7 +238,34 @@ const Payroll = () => {
               maximumFractionDigits: 2
             })}
           </>
-        )
+        ),
+        Edit: ({ column, row }) => {
+          return (
+            <TextField
+              error={!!validationErrors.bonus}
+              helperText={validationErrors.bonus}
+              sx={{
+                'input::-webkit-outer-spin-button, input::-webkit-inner-spin-button': {
+                  WebkitAppearance: 'none'
+                },
+                'input[type=number]': {
+                  MozAppearance: 'textfield'
+                },
+                m: 0
+              }}
+              variant="standard"
+              type="number"
+              fullWidth
+              defaultValue={row._valuesCache[column.id]}
+              onChange={(newValue) => (row._valuesCache[column.id] = Number(newValue.target.value))}
+              margin="normal"
+              InputProps={{
+                inputProps: { min: 0, max: 280 },
+                endAdornment: 'zł'
+              }}
+            />
+          );
+        }
       },
       {
         accessorKey: 'bonusTotal',
@@ -272,7 +312,7 @@ const Payroll = () => {
         )
       }
     ],
-    []
+    [validationErrors]
   );
 
   const table = useMaterialReactTable({
@@ -401,6 +441,12 @@ const Payroll = () => {
 
   return <MaterialReactTable table={table} />;
 };
+
+function validateBonus(values) {
+  return {
+    bonus: values.bonus <= 0 ? 'Premia nie może być ujemna' : ''
+  };
+}
 
 async function handleExportData(type, filterDate) {
   try {
