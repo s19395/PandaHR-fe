@@ -227,7 +227,7 @@ export default function Employees() {
   const table = useMaterialReactTable({
     columns,
     data: fetchedEmployees,
-    editDisplayMode: 'row',
+    editDisplayMode: 'modal',
     enableColumnPinning: true,
     enableDensityToggle: false,
     enableEditing: true,
