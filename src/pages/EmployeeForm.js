@@ -66,17 +66,16 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
     trigger
   } = useForm({
     defaultValues: initialFormValues,
-    resolver: resolver(activeStep)
+    resolver: resolver(activeStep),
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit'
   });
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    // Re-run validation schema on step change
-    trigger();
-  }, [activeStep, trigger]);
+  useEffect(() => {}, [activeStep, trigger]);
 
   const fetchData = async () => {
     try {
