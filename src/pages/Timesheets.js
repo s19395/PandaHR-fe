@@ -115,6 +115,8 @@ export default function Timesheet() {
         Edit: ({ column, row }) => {
           return (
             <TextField
+              error={!!validationErrors.workedHours}
+              helperText={validationErrors.workedHours}
               label="Godziny"
               type="number"
               fullWidth
@@ -136,6 +138,8 @@ export default function Timesheet() {
         Edit: ({ column, row }) => {
           return (
             <TextField
+              error={!!validationErrors.workedWeekends}
+              helperText={validationErrors.workedWeekends}
               label="Dni weekendowe"
               type="number"
               fullWidth
@@ -344,14 +348,16 @@ export default function Timesheet() {
   return <MaterialReactTable table={table} />;
 }
 
-// eslint-disable-next-line no-unused-vars
-const validateRequired = (value) => !!value.length;
-
-// eslint-disable-next-line no-unused-vars
 function validateTimesheet(timesheet) {
   return {
-    // firstName: !validateRequired(timesheet.firstName) ? 'First Name is Required' : '',
-    // lastName: !validateRequired(timesheet.lastName) ? 'Last Name is Required' : ''
+    workedHours:
+      timesheet.workedHours <= 0 ? 'Liczba przepracowanych godzin musi być dodatnia' : '',
+    workedWeekends:
+      timesheet.workedWeekends < 0
+        ? 'Liczba przepracowanych dni weekendowych musi być dodatnia'
+        : timesheet.workedWeekends > 10
+          ? 'Liczba przepracowanych dni weekendowych nie może przekraczać 10'
+          : ''
   };
 }
 

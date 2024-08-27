@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import { MaterialReactTable, createRow, useMaterialReactTable } from 'material-react-table';
-import { Box, Button, IconButton, Tooltip, darken, lighten } from '@mui/material';
+import { Box, Button, IconButton, Tooltip, darken, lighten, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useRequestWithNotification } from '../service/AxiosService';
 import { MRT_Localization_PL } from 'material-react-table/locales/pl';
-import { CustomNumeric, CustomCheckbox } from './CustomFields';
+import { CustomCheckbox } from './CustomFields';
 import Checkbox from '@mui/material/Checkbox';
 import 'dayjs/locale/pl';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -61,7 +61,7 @@ const Contracts = () => {
   }, [employee]);
 
   const handleCreateContract = async ({ values, row, table }) => {
-    const newValidationErrors = validateConracts(values);
+    const newValidationErrors = validateContracts(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
       return;
@@ -103,7 +103,7 @@ const Contracts = () => {
   };
 
   const handleSaveContract = async ({ values, table, row }) => {
-    const newValidationErrors = validateConracts(values);
+    const newValidationErrors = validateContracts(values);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
       return;
@@ -235,7 +235,6 @@ const Contracts = () => {
               label="Data od"
               defaultValue={dayjs(row._valuesCache.validFrom)}
               onChange={(newValue) => (row._valuesCache[column.id] = newValue)}
-              sx={{ mb: 2 }}
               slotProps={{
                 textField: {
                   variant: 'standard',
@@ -264,7 +263,6 @@ const Contracts = () => {
               label="Data do"
               defaultValue={dayjs(row._valuesCache.validTo)}
               onChange={(newValue) => (row._valuesCache[column.id] = newValue)}
-              sx={{ mb: 2 }}
               slotProps={{
                 textField: {
                   variant: 'standard',
@@ -293,7 +291,6 @@ const Contracts = () => {
               label="Data zawarcia"
               defaultValue={dayjs(row._valuesCache.signedAt)}
               onChange={(newValue) => (row._valuesCache[column.id] = newValue)}
-              sx={{ mb: 2 }}
               slotProps={{
                 textField: {
                   variant: 'standard',
@@ -322,12 +319,11 @@ const Contracts = () => {
               label="Data zakończenia"
               defaultValue={dayjs(row._valuesCache.terminationDate)}
               onChange={(newValue) => (row._valuesCache[column.id] = newValue)}
-              sx={{ mb: 2 }}
               slotProps={{
                 textField: {
                   variant: 'standard',
-                  error: !!validationErrors?.validTo,
-                  helperText: validationErrors?.validTo
+                  error: !!validationErrors?.terminationDate,
+                  helperText: validationErrors?.terminationDate
                 }
               }}
             />
@@ -342,7 +338,7 @@ const Contracts = () => {
         muiEditTextFieldProps: ({ row }) => ({
           select: true,
           sx: {
-            mt: 0.25,
+            mt: 3,
             display: row.depth === 0 ? 'flex' : 'none'
           }
         })
@@ -353,7 +349,33 @@ const Contracts = () => {
         id: 'hourlyRate',
         filterVariant: 'autocomplete',
         Cell: ({ cell }) => (cell.getValue() ? cell.getValue() + ' zł/h' : ''),
-        Edit: (props) => <CustomNumeric {...props} suffix=" zł/h" />
+        Edit: ({ column, row }) => {
+          return (
+            <TextField
+              error={!!validationErrors.hourlyRate}
+              helperText={validationErrors.hourlyRate}
+              sx={{
+                'input::-webkit-outer-spin-button, input::-webkit-inner-spin-button': {
+                  WebkitAppearance: 'none'
+                },
+                'input[type=number]': {
+                  MozAppearance: 'textfield'
+                }
+              }}
+              variant="standard"
+              label="Godziny"
+              type="number"
+              fullWidth
+              defaultValue={row._valuesCache[column.id]}
+              onChange={(newValue) => (row._valuesCache[column.id] = Number(newValue.target.value))}
+              margin="normal"
+              InputProps={{
+                inputProps: { min: 0, max: 280 },
+                endAdornment: 'zł/h '
+              }}
+            />
+          );
+        }
       },
       {
         accessorFn: (row) => row.earningConditionsDto?.bonusEnabled || false,
@@ -368,17 +390,69 @@ const Contracts = () => {
         id: 'bonus',
         header: 'Stawka premii',
         Cell: ({ cell }) => (cell.getValue() ? cell.getValue() + ' zł' : ''),
-        Edit: (props) => <CustomNumeric {...props} suffix=" zł" />
+        Edit: ({ column, row }) => {
+          return (
+            <TextField
+              error={!!validationErrors.bonus}
+              helperText={validationErrors.bonus}
+              sx={{
+                'input::-webkit-outer-spin-button, input::-webkit-inner-spin-button': {
+                  WebkitAppearance: 'none'
+                },
+                'input[type=number]': {
+                  MozAppearance: 'textfield'
+                }
+              }}
+              variant="standard"
+              label="Premia za dzień"
+              type="number"
+              fullWidth
+              defaultValue={row._valuesCache[column.id]}
+              onChange={(newValue) => (row._valuesCache[column.id] = Number(newValue.target.value))}
+              margin="normal"
+              InputProps={{
+                inputProps: { min: 0, max: 200 },
+                endAdornment: 'zł'
+              }}
+            />
+          );
+        }
       },
       {
         accessorFn: (row) => row.earningConditionsDto?.bonusThreshold,
         id: 'bonusThreshold',
         header: 'Warunek premii',
         Cell: ({ cell }) => (cell.getValue() ? cell.getValue() + ' dni' : ''),
-        Edit: (props) => <CustomNumeric {...props} suffix=" dni" />
+        Edit: ({ column, row }) => {
+          return (
+            <TextField
+              error={!!validationErrors.bonusThreshold}
+              helperText={validationErrors.bonusThreshold}
+              sx={{
+                'input::-webkit-outer-spin-button, input::-webkit-inner-spin-button': {
+                  WebkitAppearance: 'none'
+                },
+                'input[type=number]': {
+                  MozAppearance: 'textfield'
+                }
+              }}
+              variant="standard"
+              label="Premia za dzień"
+              type="number"
+              fullWidth
+              defaultValue={row._valuesCache[column.id]}
+              onChange={(newValue) => (row._valuesCache[column.id] = Number(newValue.target.value))}
+              margin="normal"
+              InputProps={{
+                inputProps: { min: 0, max: 10 },
+                endAdornment: 'dni'
+              }}
+            />
+          );
+        }
       }
     ],
-    [employee]
+    [employee, validationErrors]
   );
 
   const table = useMaterialReactTable({
@@ -526,13 +600,37 @@ const Contracts = () => {
   return <MaterialReactTable table={table} />;
 };
 
-// const validateRequired = (value) => !!value.length;
+const validateRequired = (value) => !!value.length;
 
-// eslint-disable-next-line no-unused-vars
-function validateConracts(contract) {
+function validateContracts(contract) {
+  console.log(
+    dayjs(contract.validTo).isValid() && dayjs(contract.validTo).isBefore(contract.validFrom)
+  );
   return {
-    // firstName: !validateRequired(contract.firstName) ? 'First Name is Required' : '',
-    // lastName: !validateRequired(contract.lastName) ? 'Last Name is Required' : ''
+    validFrom: !dayjs(contract.validFrom).isValid() ? 'Niepoprawna data' : '',
+    signedAt: !dayjs(contract.signedAt).isValid()
+      ? 'Niepoprawna data'
+      : dayjs(contract.signedAt).isAfter(contract.validFrom)
+        ? 'Data zawarcia nie może być po dacie rozpoczęcia'
+        : '',
+    validTo:
+      dayjs(contract.validTo).isValid() && dayjs(contract.validTo).isBefore(contract.validFrom)
+        ? 'Data zakończenia nie może być przed datą rozpoczęcia'
+        : '',
+    hourlyRate:
+      validateRequired(contract.hourlyRate) || contract.hourlyRate <= 0
+        ? 'Stawka godzinowa musi być większa niż 0'
+        : '',
+    bonus:
+      validateRequired(contract.bonus) || contract.bonus <= 0
+        ? 'Stawka premii musi być większa niż 0'
+        : '',
+    bonusThreshold:
+      validateRequired(contract.bonusThreshold) || contract.bonusThreshold <= 0
+        ? 'Liczba dni do premii musi być większa niż 0'
+        : contract.bonusThreshold > 10 || validateRequired(contract.bonusThreshold)
+          ? 'Liczba dni do premii nie może być większa niż 10'
+          : ''
   };
 }
 
