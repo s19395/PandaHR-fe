@@ -51,7 +51,8 @@ const EmployeeSearch = ({ onEmployeeSelect, sx }) => {
 
   return (
     <Autocomplete
-      id="asynchronous-demo"
+      noOptionsText={'Brak wyników'}
+      loadingText={'Ładowanie...'}
       sx={{ width: 300, mt: 2, ...sx }}
       open={open}
       onOpen={() => {

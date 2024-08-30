@@ -68,13 +68,13 @@ export default function Timesheet() {
       },
       {
         accessorKey: 'lastName',
-        header: 'Last Name',
+        header: 'Nazwisko',
         editable: false,
         filterVariant: 'multi-select'
       },
       {
         accessorKey: 'firstName',
-        header: 'First Name',
+        header: 'Imię',
         editable: false,
         filterVariant: 'multi-select'
       },

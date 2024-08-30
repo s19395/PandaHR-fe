@@ -77,6 +77,13 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
 
   useEffect(() => {}, [activeStep, trigger]);
 
+  useEffect(() => {
+    if (!watch('bonusEnabled')) {
+      setValue('bonus', null);
+      setValue('bonusThreshold', null);
+    }
+  }, [watch('bonusEnabled'), setValue]);
+
   const fetchData = async () => {
     try {
       const [contracts, positions] = await Promise.all([
@@ -220,14 +227,12 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
                     sx={{ mt: 2, mb: 2 }}
                     {...field}
                     onChange={(date) => setValue('dateOfBirth', date)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        error={!!errors.dateOfBirth}
-                        helperText={errors.dateOfBirth?.message}
-                      />
-                    )}
+                    slotProps={{
+                      textField: {
+                        error: !!errors.dateOfBirth, // Bolean
+                        helperText: errors.dateOfBirth?.message // String
+                      }
+                    }}
                   />
                 )}
               />
@@ -354,14 +359,12 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
                         sx={{ mt: 2, mb: 2 }}
                         {...field}
                         onChange={(date) => setValue('signedAt', date)}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            fullWidth
-                            error={!!errors.signedAt}
-                            helperText={errors.signedAt?.message}
-                          />
-                        )}
+                        slotProps={{
+                          textField: {
+                            error: !!errors.signedAt, // Bolean
+                            helperText: errors.signedAt?.message // String
+                          }
+                        }}
                       />
                     )}
                   />
@@ -377,14 +380,12 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
                               sx={{ mt: 2, mb: 2 }}
                               {...field}
                               onChange={(date) => setValue('validFrom', date)}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  fullWidth
-                                  error={!!errors.validFrom}
-                                  helperText={errors.validFrom?.message}
-                                />
-                              )}
+                              slotProps={{
+                                textField: {
+                                  error: !!errors.validFrom, // Bolean
+                                  helperText: errors.validFrom?.message // String
+                                }
+                              }}
                             />
                           )}
                         />
@@ -401,14 +402,12 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
                               sx={{ mt: 2, mb: 2 }}
                               {...field}
                               onChange={(date) => setValue('validTo', date)}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  fullWidth
-                                  error={!!errors.validTo}
-                                  helperText={errors.validTo?.message}
-                                />
-                              )}
+                              slotProps={{
+                                textField: {
+                                  error: !!errors.validTo, // Bolean
+                                  helperText: errors.validTo?.message // String
+                                }
+                              }}
                             />
                           )}
                         />
@@ -454,7 +453,9 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
                             type="number"
                             fullWidth
                             InputProps={{
-                              startAdornment: <InputAdornment position="start">dni</InputAdornment>
+                              startAdornment: (
+                                <InputAdornment position="start">Liczba dni</InputAdornment>
+                              )
                             }}
                             {...field}
                             margin="normal"
@@ -562,10 +563,18 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
                               <Divider variant="middle" />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                              <DetailItem title="Stawka godzinowa" content={watch('hourlyRate')} />
+                              <DetailItem
+                                title="Stawka godzinowa"
+                                content={watch('hourlyRate')}
+                                adornment={'PLN'}
+                              />
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                              <DetailItem title="Premia" content={watch('bonus')} />
+                              <DetailItem
+                                title="Premia"
+                                content={watch('bonus')}
+                                adornment={'PLN'}
+                              />
                             </Grid>
                             <Grid item xs={12} sm={6}>
                               <DetailItem
@@ -599,13 +608,16 @@ const CreateEmployee = ({ open, onClose, onEmployeeCreated }) => {
   );
 };
 
-export const DetailItem = ({ title, content }) => {
+export const DetailItem = ({ title, content, adornment }) => {
   return (
     <>
       <Typography variant="subtitle1" color="textSecondary">
         <strong>{title}:</strong>
       </Typography>
-      <Typography variant="body1">{content}</Typography>
+      <Box display="flex" alignItems="center">
+        <Typography variant="body1">{content}</Typography>
+        {adornment && <InputAdornment position="end">{adornment}</InputAdornment>}
+      </Box>
     </>
   );
 };
