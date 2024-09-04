@@ -7,6 +7,7 @@ registerPlugin(FilePondPluginFileValidateType);
 
 const FileUpload = ({ maxFiles, url }) => {
   const [files, setFiles] = useState([]);
+  const token = localStorage.getItem('token'); // Retrieve the token from local storage
 
   return (
     <FilePond
@@ -26,7 +27,10 @@ const FileUpload = ({ maxFiles, url }) => {
         url: process.env.REACT_APP_ENDPOINT,
         process: {
           url: url,
-          method: 'POST'
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         },
         revert: (uniqueFileId, load, error) => {
           try {
