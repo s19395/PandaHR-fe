@@ -621,11 +621,12 @@ function validateContracts(contract, row) {
         ? 'Stawka godzinowa musi być większa niż 0'
         : '',
     bonus:
-      validateRequired(contract.bonus) || contract.bonus <= 0
+      contract.bonusEnabled === true && (validateRequired(contract.bonus) || contract.bonus <= 0)
         ? 'Stawka premii musi być większa niż 0'
         : '',
     bonusThreshold:
-      validateRequired(contract.bonusThreshold) || contract.bonusThreshold <= 0
+      contract.bonusEnabled === true &&
+      (validateRequired(contract.bonusThreshold) || contract.bonusThreshold <= 0)
         ? 'Liczba dni do premii musi być większa niż 0'
         : contract.bonusThreshold > 10 || validateRequired(contract.bonusThreshold)
           ? 'Liczba dni do premii nie może być większa niż 10'
