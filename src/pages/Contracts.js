@@ -363,7 +363,7 @@ const Contracts = () => {
                 }
               }}
               variant="standard"
-              label="Godziny"
+              label="Stawka godzinowa"
               type="number"
               fullWidth
               defaultValue={row._valuesCache[column.id]}
@@ -404,7 +404,7 @@ const Contracts = () => {
                 }
               }}
               variant="standard"
-              label="Premia za dzień"
+              label="Stawka premii"
               type="number"
               fullWidth
               defaultValue={row._valuesCache[column.id]}
@@ -600,7 +600,7 @@ const Contracts = () => {
   return <MaterialReactTable table={table} />;
 };
 
-const validateRequired = (value) => !!value.length;
+const validateRequired = (value) => value !== undefined && !!value.length;
 
 function validateContracts(contract) {
   console.log(
