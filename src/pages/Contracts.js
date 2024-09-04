@@ -61,7 +61,7 @@ const Contracts = () => {
   }, [employee]);
 
   const handleCreateContract = async ({ values, row, table }) => {
-    const newValidationErrors = validateContracts(values);
+    const newValidationErrors = validateContracts(values, row);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
       return;
@@ -103,7 +103,7 @@ const Contracts = () => {
   };
 
   const handleSaveContract = async ({ values, table, row }) => {
-    const newValidationErrors = validateContracts(values);
+    const newValidationErrors = validateContracts(values, row);
     if (Object.values(newValidationErrors).some((error) => error)) {
       setValidationErrors(newValidationErrors);
       return;
@@ -602,10 +602,7 @@ const Contracts = () => {
 
 const validateRequired = (value) => value !== undefined && !!value.length;
 
-function validateContracts(contract) {
-  console.log(
-    dayjs(contract.validTo).isValid() && dayjs(contract.validTo).isBefore(contract.validFrom)
-  );
+function validateContracts(contract, row) {
   return {
     validFrom: !dayjs(contract.validFrom).isValid() ? 'Niepoprawna data' : '',
     signedAt: !dayjs(contract.signedAt).isValid()
@@ -614,7 +611,9 @@ function validateContracts(contract) {
         ? 'Data zawarcia nie może być po dacie rozpoczęcia'
         : '',
     validTo:
-      dayjs(contract.validTo).isValid() && dayjs(contract.validTo).isBefore(contract.validFrom)
+      row.depth === 0 &&
+      dayjs(contract.validTo).isValid() &&
+      dayjs(contract.validTo).isBefore(contract.validFrom)
         ? 'Data zakończenia nie może być przed datą rozpoczęcia'
         : '',
     hourlyRate:
