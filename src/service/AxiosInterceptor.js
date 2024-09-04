@@ -1,8 +1,5 @@
 import axios from 'axios';
 
-axios.defaults.headers.post['Content-Type'] = 'application/json';
-axios.defaults.baseURL = process.env.REACT_APP_ENDPOINT;
-
 const apiClient = axios.create({
   baseURL: process.env.REACT_APP_ENDPOINT,
   headers: {
@@ -12,7 +9,8 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('jwtToken');
+    const token = localStorage.getItem('token');
+
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
