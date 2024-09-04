@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAlert } from './AlertService';
+import apiClient from './AxiosInterceptor';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.baseURL = process.env.REACT_APP_ENDPOINT;
@@ -52,7 +53,7 @@ export const request = async (method, url, data, token = getAuthToken()) => {
     headers = { Authorization: `Bearer ${token}` };
   }
 
-  return axios({
+  return apiClient({
     method: method,
     url: url,
     headers: headers,
