@@ -167,7 +167,7 @@ export default function Timesheet() {
     setIsSaving(true);
     try {
       const timesheetDto = {
-        date: values.date,
+        date: values?.date ? dayjs(values.date).format('YYYY-MM-DD') : '',
         workedWeekends: values.workedWeekends,
         workedHours: values.workedHours
       };
